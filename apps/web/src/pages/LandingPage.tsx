@@ -43,11 +43,14 @@ export function LandingPage() {
           
           {/* Right: Actions */}
           <div className="flex items-center gap-4 z-10">
-            <Link 
-              to="/app" 
-              className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-emerald-400 hover:text-black hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all transform hover:scale-105 active:scale-95"
-            >
-              Coba Sekarang
+            <Link to="/app">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.9 }}
+                className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-colors"
+              >
+                Coba Sekarang
+              </motion.button>
             </Link>
           </div>
           
@@ -76,12 +79,16 @@ export function LandingPage() {
               Memahami dinamika pasar hiperlokal melalui simulasi AI agent berbasis data psikografi dan demografi nyata secara instan.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link 
-                to="/app" 
-                className="group flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-white text-black text-lg font-bold rounded-full hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(52,211,153,0.4)] transition-all"
-              >
-                Mulai Simulasi Sekarang
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/app" className="w-full sm:w-auto">
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95, y: 2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className="group flex items-center justify-center gap-2 w-full px-8 py-4 bg-white text-black text-lg font-bold rounded-full hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(52,211,153,0.6)] transition-colors"
+                >
+                  Mulai Simulasi Sekarang
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </motion.button>
               </Link>
             </div>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6 opacity-60">
@@ -289,13 +296,17 @@ function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }
         ))}
       </div>
       
-      <button className={`w-full py-3.5 rounded-xl font-bold transition-all transform active:scale-95 ${
-        isPopular 
-          ? "bg-gradient-to-r from-emerald-400 to-cyan-500 text-black hover:shadow-[0_0_25px_rgba(52,211,153,0.4)]" 
-          : "bg-white/5 text-white hover:bg-white/10"
-      }`}>
+      <motion.button 
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.92 }}
+        className={`w-full py-3.5 rounded-xl font-bold transition-colors ${
+          isPopular 
+            ? "bg-gradient-to-r from-emerald-400 to-cyan-500 text-black hover:shadow-[0_0_25px_rgba(52,211,153,0.4)]" 
+            : "bg-white/5 text-white hover:bg-white/10"
+        }`}
+      >
         {buttonText}
-      </button>
+      </motion.button>
     </div>
   );
 }
