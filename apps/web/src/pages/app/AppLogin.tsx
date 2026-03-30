@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Activity, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
-import { ParticlesBackground } from "../../components/ui/ParticlesBackground";
 
 export function AppLogin() {
   const { connected } = useWallet();
@@ -28,78 +27,115 @@ export function AppLogin() {
 
   return (
     <div 
-      className="min-h-screen bg-[#050505] flex items-center justify-center p-6 text-center font-sans relative overflow-hidden selection:bg-emerald-500/30"
+      className="min-h-screen bg-[#020204] flex items-center justify-center p-6 text-center font-sans relative overflow-hidden selection:bg-emerald-500/30"
       onMouseMove={handleMouseMove}
     >
-      <ParticlesBackground />
+      {/* 3D Moving Perspective Grid */}
+      <div className="cyber-grid" />
       
-      {/* Background Spotlight Glow */}
+      {/* Animated Scanline */}
+      <div className="scanline" />
+
+      {/* Decorative Glows */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
+
       <motion.div
-        className="pointer-events-none absolute inset-0 z-0 transition duration-300 opacity-30"
+        className="pointer-events-none absolute inset-0 z-10 transition duration-300 opacity-20"
         style={{
           background: useMotionTemplate`
             radial-gradient(
-              650px circle at ${mouseX}px ${mouseY}px,
-              rgba(16, 185, 129, 0.15),
+              600px circle at ${mouseX}px ${mouseY}px,
+              rgba(16, 185, 129, 0.2),
               transparent 80%
             )
           `,
         }}
       />
 
+      <Link to="/" className="fixed top-8 left-8 z-50 p-3 text-slate-500 hover:text-white transition-all rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 group flex items-center gap-2 font-bold text-xs uppercase tracking-widest backdrop-blur-sm">
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        Back to Nexus
+      </Link>
+
       <motion.div 
         initial="hidden"
         animate="visible"
         variants={{
-          hidden: { opacity: 0, y: 20 },
+          hidden: { opacity: 0 },
           visible: { 
             opacity: 1, 
-            y: 0,
             transition: {
-              staggerChildren: 0.1,
-              delayChildren: 0.2
+              staggerChildren: 0.15,
             }
           }
         }}
-        className="max-w-md w-full p-10 rounded-[2.5rem] border border-white/5 bg-[#0a0a0f]/60 backdrop-blur-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] relative z-10"
+        className="relative z-20 w-full max-w-xl"
       >
-        <Link to="/" className="absolute top-8 left-8 p-2 text-slate-500 hover:text-white transition-colors rounded-full hover:bg-white/5 group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-        </Link>
-        
         <motion.div 
-          variants={{ hidden: { scale: 0.8, opacity: 0 }, visible: { scale: 1, opacity: 1 } }}
-          className="relative w-24 h-24 mx-auto mb-10 group"
+          variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
+          className="flex flex-col items-center"
         >
-          {/* Animated glow ring */}
-          <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-3xl group-hover:bg-emerald-500/40 transition-all duration-700 animate-pulse" />
-          
-          <div className="relative w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-900/5 backdrop-blur-sm rounded-3xl flex items-center justify-center border border-emerald-500/30 shadow-2xl overflow-hidden">
-            <img src="/logo.png" alt="PasarSim Logo" className="w-12 h-12 object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
+          {/* Minimalist Tech Branding */}
+          <div className="mb-12 relative">
+            <motion.div
+              animate={{ 
+                scale: [1, 1.05, 1],
+                opacity: [0.5, 1, 0.5]
+              }}
+              transition={{ repeat: Infinity, duration: 4 }}
+              className="absolute inset-0 bg-emerald-400 blur-3xl opacity-20 rounded-full"
+            />
+            <div className="relative flex flex-col items-center group">
+              <div className="w-16 h-16 mb-6 flex items-center justify-center rounded-2xl bg-[#050505] border border-white/10 shadow-[0_0_30px_rgba(16,185,129,0.1)] group-hover:border-emerald-500/50 transition-all duration-500">
+                <Activity className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h1 className="text-6xl font-black text-white tracking-tighter mb-2 italic">
+                PASARSIM
+              </h1>
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/5">
+                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">
+                  B2B Security Protocol
+                </span>
+              </div>
+            </div>
           </div>
-        </motion.div>
-        
-        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
-          <h2 className="text-4xl font-extrabold text-white mb-4 tracking-tight">Access Portal</h2>
-          <p className="text-slate-400 mb-12 leading-relaxed text-sm w-11/12 mx-auto">
-            Hubungkan wallet Solana Anda untuk masuk ke sistem intelijen pasar hiperlokal eksklusif.
-          </p>
-        </motion.div>
-        
-        <motion.div 
-          variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }}
-          className="flex justify-center flex-col gap-5 w-full"
-        >
-          <div className="w-full [&_.wallet-adapter-button]:!w-full [&_.wallet-adapter-button]:!h-14 [&_.wallet-adapter-button]:!bg-white [&_.wallet-adapter-button]:!text-[#050505] [&_.wallet-adapter-button]:!rounded-2xl [&_.wallet-adapter-button]:!font-sans [&_.wallet-adapter-button]:!font-black [&_.wallet-adapter-button]:!text-sm [&_.wallet-adapter-button]:!uppercase [&_.wallet-adapter-button]:!tracking-widest [&_.wallet-adapter-button]:hover:!bg-emerald-400 [&_.wallet-adapter-button]:!transition-all [&_.wallet-adapter-button-start-icon]:!hidden flex justify-center shadow-2xl">
-            <WalletMultiButton>Connect Portal</WalletMultiButton>
-          </div>
+
+          <div className="w-full max-w-md h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-12" />
+
           <motion.div 
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ repeat: Infinity, duration: 3 }}
-            className="text-[10px] text-emerald-400 font-bold uppercase tracking-[0.2em]"
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            className="text-center mb-16"
           >
-            B2B Identity Verified
+            <h2 className="text-xl font-bold text-slate-200 mb-4 uppercase tracking-widest leading-none">
+              Initialize Data Connection
+            </h2>
+            <p className="text-slate-500 text-sm max-w-xs mx-auto leading-relaxed">
+              Unlock hyperlocal market intelligence by authenticating your Solana identity.
+            </p>
+          </motion.div>
+          
+          <motion.div 
+            variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } }}
+            className="w-full max-w-xs space-y-6"
+          >
+            <div className="wallet-button-wrapper relative group">
+              {/* Button Glow */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-pulse" />
+              
+              <div className="relative [&_.wallet-adapter-button]:!w-full [&_.wallet-adapter-button]:!h-16 [&_.wallet-adapter-button]:!bg-white [&_.wallet-adapter-button]:!text-black [&_.wallet-adapter-button]:!rounded-full [&_.wallet-adapter-button]:!font-black [&_.wallet-adapter-button]:!text-sm [&_.wallet-adapter-button]:!uppercase [&_.wallet-adapter-button]:!tracking-[0.2em] [&_.wallet-adapter-button]:hover:!bg-emerald-400 [&_.wallet-adapter-button]:!transition-all [&_.wallet-adapter-button-start-icon]:!hidden flex justify-center">
+                <WalletMultiButton>Auth Identity</WalletMultiButton>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-center gap-6 opacity-30 group">
+              <div className="h-px w-8 bg-white/20" />
+              <div className="text-[9px] font-bold uppercase tracking-[0.4em] text-white whitespace-nowrap">
+                Encrypted Connection
+              </div>
+              <div className="h-px w-8 bg-white/20" />
+            </div>
           </motion.div>
         </motion.div>
       </motion.div>
