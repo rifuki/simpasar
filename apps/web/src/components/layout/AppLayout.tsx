@@ -21,8 +21,15 @@ export function AppLayout() {
       {/* Sidebar */}
       <aside className="w-64 shrink-0 border-r border-white/5 bg-[#0a0a0f] flex flex-col relative z-20">
         <div className="px-6 py-6 border-b border-white/5">
-          <div className="text-white font-bold text-lg tracking-tight">PasarSim</div>
-          <div className="text-emerald-400 text-xs mt-1 font-medium tracking-wide shadow-sm">B2B Portal</div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center p-1 rounded-lg bg-white/5 border border-white/10">
+              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <div className="text-white font-bold text-lg tracking-tight leading-none">PasarSim</div>
+              <div className="text-emerald-400 text-[10px] uppercase font-bold tracking-widest mt-1 opacity-80">B2B Portal</div>
+            </div>
+          </div>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-2">

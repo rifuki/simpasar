@@ -64,9 +64,9 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative">
           
           {/* Left: Logo */}
-          <div className="flex items-center gap-2 z-10">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center shadow-[0_0_15px_rgba(52,211,153,0.3)]">
-              <Activity className="w-5 h-5 text-black" strokeWidth={2.5} />
+          <div className="flex items-center gap-3 z-10">
+            <div className="w-9 h-9 flex items-center justify-center p-1.5 rounded-xl bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(52,211,153,0.1)]">
+              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
               PasarSim
@@ -330,9 +330,11 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/5 bg-[#0a0a0f] py-12 px-6">
         <div className="max-w-7xl mx-auto flex py-4 flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-emerald-400" />
-            <span className="text-lg font-bold text-white">PasarSim</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center p-1 rounded-lg bg-white/5 border border-white/10">
+              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <span className="text-lg font-bold text-white opacity-70 group-hover:opacity-100 transition-opacity">PasarSim</span>
           </div>
           <p className="text-slate-500 text-sm">© 2026 PasarSim. Empowering Local Commerce.</p>
         </div>
