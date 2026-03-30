@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { 
-  ArrowRight, Activity, Users, CheckCircle, MapPin, BrainCircuit, ShieldCheck 
+  ArrowRight, Activity, Users, CheckCircle, MapPin, BrainCircuit 
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -33,9 +33,9 @@ export function LandingPage() {
           <div className="flex items-center gap-4 z-10">
             <Link 
               to="/app" 
-              className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-emerald-400 hover:text-black hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all"
+              className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-emerald-400 hover:text-black hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all transform hover:scale-105 active:scale-95"
             >
-              Mulai Simulasi
+              Coba Sekarang
             </Link>
           </div>
           
@@ -52,7 +52,7 @@ export function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-8">
-              <BrainCircuit className="w-4 h-4" /> AI Consumer Simulation & Prediction
+              <BrainCircuit className="w-4 h-4" /> Hyperlocal Market Intelligence
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
               Validasi Ide Bisnis di Klaster Suburban <br/>
@@ -61,7 +61,7 @@ export function LandingPage() {
               </span>
             </h1>
             <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Simulasikan respons pasar menggunakan AI agent berbasis data demografi nyata di Jabodetabek (BSD, Gading Serpong, Depok, Bekasi).
+              Memahami dinamika pasar Jabodetabek melalui simulasi AI agent berbasis data psikografi dan demografi nyata secara instan.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link 
@@ -84,8 +84,8 @@ export function LandingPage() {
         {/* Problem Section */}
         <section className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Kenapa 70% Bisnis Baru Gagal?</h2>
-            <p className="text-slate-400">Karena pelaku bisnis mengandalkan asusmsi, bukan data psikografi yang presisi.</p>
+            <h2 className="text-3xl font-bold text-white mb-4">65.5 Juta UMKM, Rp 0 Data Lokal.</h2>
+            <p className="text-slate-400">Pemilik bisnis membuang ratusan juta membuka cabang hanya bermodalkan "Gut Feel" (insting).</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <ProblemCard 
@@ -163,29 +163,33 @@ export function LandingPage() {
         {/* Pricing */}
         <section id="pricing" className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Akses Instan ke Data Pasar Lokal</h2>
-            <p className="text-slate-400">Riset pasar profesional dengan harga terjangkau.</p>
+            <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 tracking-tight">
+              Simulate Before You Open.
+            </h2>
+            <p className="text-slate-400">Riset tingkat enterprise, harga UMKM. Tersedia dalam Pay-As-You-Go maupun langganan.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <PricingCard 
-              title="Individual"
-              price="Gratis"
-              features={["1 Simulasi / hari", "Insight Dasar", "Pilih 1 Kota", "Simpan Riwayat"]}
-              buttonText="Mulai Sekarang"
+              title="Pay-As-You-Go"
+              price="75.000 IDR"
+              priceIdr="/ credit (1 Simulasi)"
+              features={["1 Credit Simulasi", "Tanpa Langganan", "Akses 4 Klaster Jabodetabek", "Full Sentiment Analysis", "Credit Berlaku 12 Bulan"]}
+              buttonText="Beli Credit"
             />
             <PricingCard 
               isPopular
-              title="Professional"
-              price="75.000 IDR"
-              priceIdr="per credit / simulasi"
-              features={["Akses Semua Klaster", "Full Sentiment Analysis", "Backfire Warnings", "Willingness-to-Pay Map", "Export Report (PDF)"]}
-              buttonText="Beli Credit (Solana Pay)"
+              title="Explorer"
+              price="150.000 IDR"
+              priceIdr="/ bulan (Berlangganan)"
+              features={["3 Simulasi per Bulan", "Prioritas Render < 48 Jam", "Akses 4 Klaster Jabodetabek", "WTP & Backfire Alerts", "Export PDF Insights"]}
+              buttonText="Mulai Langganan"
             />
             <PricingCard 
-              title="Business"
-              price="Custom"
-              features={["Custom Persona Library", "API Access", "Market Trends Predictor", "Dedicated Support"]}
-              buttonText="Hubungi Sales"
+              title="Pro"
+              price="750.000 IDR"
+              priceIdr="/ bulan (Berlangganan)"
+              features={["Unlimited Simulasi", "Prioritas Tertinggi (< 8 Jam)", "Custom Persona Library", "PasarSim API Access", "Dedicated Support Manager"]}
+              buttonText="Mulai Pro"
             />
           </div>
         </section>
@@ -236,29 +240,37 @@ function Step({ num, title, desc }: { num: string, title: string, desc: string }
 
 function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }: any) {
   return (
-    <div className={`p-8 rounded-3xl border ${isPopular ? "border-emerald-500 shadow-[0_0_30px_rgba(52,211,153,0.15)] bg-emerald-950/20" : "border-white/10 bg-[#0a0a0f]"} relative flex flex-col`}>
+    <div className={`p-8 rounded-3xl border transition-all duration-300 group ${
+      isPopular 
+        ? "border-emerald-500/50 shadow-[0_0_40px_rgba(52,211,153,0.15)] bg-emerald-950/20 scale-105 z-10" 
+        : "border-white/10 bg-[#0a0a0f] hover:border-white/20"
+    } relative flex flex-col`}>
       {isPopular && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-black text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-          Paling Laris
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-emerald-400 to-cyan-500 text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-emerald-500/20">
+          Recomended
         </div>
       )}
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{title}</h3>
       <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-4xl font-extrabold text-white">{price}</span>
+        <span className="text-4xl font-extrabold text-white tracking-tight">{price}</span>
       </div>
-      {priceIdr && <p className="text-emerald-400 text-sm font-medium mb-6">{priceIdr}</p>}
+      {priceIdr && <p className="text-emerald-400/80 text-xs font-semibold mb-6">{priceIdr}</p>}
       {!priceIdr && <div className="h-5 mb-6" />}
       
-      <div className="space-y-4 mb-8 flex-1">
+      <div className="space-y-4 mb-10 flex-1">
         {features.map((f: string, i: number) => (
-          <div key={i} className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-slate-500" />
-            <span className="text-slate-300 text-sm">{f}</span>
+          <div key={i} className="flex items-start gap-3">
+            <CheckCircle className="w-4 h-4 text-emerald-500/50 mt-0.5 shrink-0" />
+            <span className="text-slate-300 text-sm leading-tight">{f}</span>
           </div>
         ))}
       </div>
       
-      <button className={`w-full py-3.5 rounded-xl font-bold transition-all ${isPopular ? "bg-emerald-500 text-black hover:bg-emerald-400" : "bg-white/5 text-white hover:bg-white/10"}`}>
+      <button className={`w-full py-3.5 rounded-xl font-bold transition-all transform active:scale-95 ${
+        isPopular 
+          ? "bg-gradient-to-r from-emerald-400 to-cyan-500 text-black hover:shadow-[0_0_25px_rgba(52,211,153,0.4)]" 
+          : "bg-white/5 text-white hover:bg-white/10"
+      }`}>
         {buttonText}
       </button>
     </div>

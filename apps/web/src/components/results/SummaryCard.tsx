@@ -155,49 +155,55 @@ export function SummaryCard({ result }: Props) {
       </div>
 
       {/* Strategic Intelligence (NEW) */}
-      <div className="pt-4 border-t border-slate-700/50 space-y-4">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Strategic Intelligence</h3>
+      <div className="pt-6 border-t border-slate-700/50 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Strategic Intelligence</h3>
+          <div className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] text-emerald-400 font-bold uppercase">AI Analysis</div>
+        </div>
         
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-slate-900/60 rounded-xl p-3">
-            <div className="flex items-center gap-2 text-[10px] text-slate-500 mb-2">
-              <Handshake className="w-3.5 h-3.5 text-blue-400" /> SENTIMEN
+          <div className="bg-slate-900/40 backdrop-blur-sm rounded-xl p-3 border border-white/5">
+            <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold mb-2">
+              <Handshake className="w-3 h-3 text-cyan-400" /> SENTIMEN
             </div>
-            <div className="flex gap-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-              <div className="bg-emerald-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.positive.length || 1) * 33}%` }} />
-              <div className="bg-slate-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.neutral.length || 1) * 33}%` }} />
-              <div className="bg-red-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.negative.length || 1) * 33}%` }} />
+            <div className="flex gap-1 h-1.5 bg-slate-800/50 rounded-full overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full" style={{ width: `${(summary.sentimentAnalysis?.positive.length || 1) * 33}%` }} />
+              <div className="bg-slate-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.neutral.length || 1) * 10}%` }} />
+              <div className="bg-gradient-to-r from-red-600 to-red-400 h-full" style={{ width: `${(summary.sentimentAnalysis?.negative.length || 1) * 15}%` }} />
             </div>
-            <p className="text-[10px] text-slate-400 mt-2 italic line-clamp-1">
-              "{summary.overallRecommendation.split('.')[0]}"
-            </p>
+            <div className="mt-2 text-[10px] text-slate-300 font-medium truncate">
+              {summary.sentimentAnalysis?.positive[0] || "Respon cerah"}
+            </div>
           </div>
 
-          <div className="bg-slate-900/60 rounded-xl p-3">
-            <div className="flex items-center gap-2 text-[10px] text-slate-500 mb-2">
-              <Footprints className="w-3.5 h-3.5 text-orange-400" /> FOOT TRAFFIC
+          <div className="bg-slate-900/40 backdrop-blur-sm rounded-xl p-3 border border-white/5">
+            <div className="flex items-center gap-2 text-[9px] text-slate-400 font-bold mb-2">
+              <Footprints className="w-3 h-3 text-orange-400" /> FOOT TRAFFIC
             </div>
-            <div className="text-sm font-bold text-white capitalize">
+            <div className="text-sm font-black text-white tracking-tight">
               {summary.footTrafficImpact || "Medium"}
             </div>
-            <div className="text-[9px] text-slate-500 mt-1 uppercase">Impact Level</div>
+            <div className="text-[8px] text-slate-500 mt-0.5 uppercase font-bold">Impak Estimasi</div>
           </div>
 
-          <div className="bg-slate-900/60 rounded-xl p-3 border border-red-500/20">
-            <div className="flex items-center gap-2 text-[10px] text-red-400 mb-2">
-              <AlertOctagon className="w-3.5 h-3.5" /> BACKFIRE ALERTS
+          <div className="bg-slate-900/40 backdrop-blur-sm rounded-xl p-3 border border-red-500/10">
+            <div className="flex items-center gap-2 text-[9px] text-red-400 font-bold mb-2">
+              <AlertOctagon className="w-3 h-3" /> BACKFIRE
             </div>
-            <div className="text-sm font-bold text-red-500">
+            <div className="text-sm font-black text-red-500 tracking-tight">
               {summary.backfireWarnings?.length || 0}
             </div>
-            <div className="text-[9px] text-slate-500 mt-1 uppercase">Potential Blunders</div>
+            <div className="text-[8px] text-slate-500 mt-0.5 uppercase font-bold">Potensi Resiko</div>
           </div>
         </div>
 
         {summary.backfireWarnings && summary.backfireWarnings.length > 0 && (
-          <div className="bg-red-500/5 border border-red-500/10 rounded-lg p-3">
-            <p className="text-[10px] text-red-400 font-bold mb-1 uppercase tracking-tighter">⚠️ Backfire Warning</p>
-            <p className="text-[11px] text-slate-400 leading-tight">
+          <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-3 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/5 blur-2xl rounded-full" />
+            <p className="text-[10px] text-red-400 font-black mb-1 uppercase tracking-widest flex items-center gap-2">
+              <AlertOctagon className="w-3 h-3" /> Warning Utama
+            </p>
+            <p className="text-[11px] text-slate-300 leading-relaxed relative z-10">
               {summary.backfireWarnings[0]}
             </p>
           </div>
