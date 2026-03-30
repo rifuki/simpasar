@@ -43,9 +43,9 @@ export function AppDashboard() {
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-white tracking-tight mb-2"
+            className="text-2xl font-bold text-white tracking-tight mb-1"
           >
-            Selamat Datang 👋
+            Overview
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -53,7 +53,7 @@ export function AppDashboard() {
             transition={{ delay: 0.1 }}
             className="text-slate-400 text-sm"
           >
-            Simulasikan produk Anda sebelum launching ke pasar.
+            Manage your hyperlocal market intelligence simulations.
           </motion.p>
         </div>
 
@@ -62,7 +62,7 @@ export function AppDashboard() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
           onClick={() => setShowTopUp(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-[#021A11] font-semibold text-sm transition-all shadow-lg hover:shadow-[0_0_15px_rgba(52,211,153,0.3)]"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-slate-200 font-semibold text-sm transition-all"
         >
           Top Up Saldo
         </motion.button>
@@ -74,31 +74,31 @@ export function AppDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="lg:col-span-1 bg-gradient-to-br from-emerald-900/40 to-emerald-950/20 border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden"
+          className="lg:col-span-1 bg-[#0a0a0f] border border-white/[0.08] shadow-2xl rounded-2xl p-6 relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 p-6 opacity-20">
-            <Wallet className="w-32 h-32 text-emerald-400" />
+          <div className="absolute top-0 right-0 p-6 opacity-5">
+            <Wallet className="w-32 h-32 text-white" />
           </div>
 
           <div className="relative z-10">
-            <div className="text-emerald-400 text-sm font-medium mb-4 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Saldo Credit Tersedia
+            <div className="text-slate-400 text-sm font-medium mb-4 flex items-center gap-2 border border-white/10 bg-white/5 w-fit px-3 py-1.5 rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-slate-300" />
+              Saldo Aktif
             </div>
 
             {isLoading ? (
               <div className="h-16 w-32 bg-white/5 animate-pulse rounded-lg" />
             ) : (
-              <div className="text-6xl font-black text-white tracking-tighter">
+              <div className="text-6xl font-bold text-white tracking-tight">
                 {user?.credits || 0}
               </div>
             )}
 
-            <div className="text-emerald-400/70 text-sm mt-2">
+            <div className="text-slate-500 text-sm mt-2">
               credit tersisa
             </div>
 
-            <div className="mt-6 pt-6 border-t border-emerald-500/20">
+            <div className="mt-8 pt-5 border-t border-white/5">
               <div className="text-xs text-slate-400 mb-1">
                 1 Simulasi = 1 Credit
               </div>
@@ -112,20 +112,20 @@ export function AppDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="lg:col-span-2 bg-[#111] border border-white/10 rounded-2xl p-6"
+          className="lg:col-span-2 bg-[#0a0a0f] border border-white/[0.08] shadow-2xl rounded-2xl p-6 flex flex-col justify-center"
         >
-          <h3 className="text-white font-semibold mb-6">Mulai Simulasi</h3>
+          <h3 className="text-white text-lg font-semibold mb-6">Mulai Simulasi</h3>
 
           <Link
             to="/app/simulate"
-            className="group flex items-center justify-between p-5 bg-gradient-to-r from-emerald-500/10 to-transparent border border-emerald-500/20 rounded-xl hover:border-emerald-500/40 transition-all mb-4"
+            className="group flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-white/[0.04] transition-all mb-4"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <Beaker className="w-6 h-6 text-emerald-400" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
+                <Beaker className="w-5 h-5 text-slate-300" />
               </div>
               <div>
-                <div className="text-white font-semibold group-hover:text-emerald-400 transition-colors">
+                <div className="text-white font-medium group-hover:text-slate-200 transition-colors">
                   Simulasi Baru
                 </div>
                 <div className="text-slate-400 text-sm">
@@ -133,19 +133,19 @@ export function AppDashboard() {
                 </div>
               </div>
             </div>
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white mt-4 md:mt-0 transition-all group-hover:translate-x-1" />
           </Link>
 
           <Link
             to="/app/history"
-            className="group flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-all"
+            className="group flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-white/[0.04] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                <Zap className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-slate-300" />
               </div>
               <div>
-                <div className="text-white font-semibold group-hover:text-blue-400 transition-colors">
+                <div className="text-white font-medium group-hover:text-slate-200 transition-colors">
                   Riwayat Simulasi
                 </div>
                 <div className="text-slate-400 text-sm">
@@ -153,7 +153,7 @@ export function AppDashboard() {
                 </div>
               </div>
             </div>
-            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white mt-4 md:mt-0 transition-all group-hover:translate-x-1" />
           </Link>
         </motion.div>
       </div>
@@ -166,15 +166,13 @@ export function AppDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + index * 0.1 }}
-            className="bg-[#111] border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all"
+            className="bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-xl p-5 hover:bg-white/[0.02] transition-colors"
           >
-            <div
-              className={`w-10 h-10 rounded-lg bg-${feature.color}-500/10 border border-${feature.color}-500/20 flex items-center justify-center mb-3`}
-            >
-              <feature.icon className={`w-5 h-5 text-${feature.color}-400`} />
+            <div className="w-10 h-10 rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-4">
+              <feature.icon className="w-5 h-5 text-slate-300" />
             </div>
-            <h4 className="text-white font-medium mb-1">{feature.title}</h4>
-            <p className="text-slate-500 text-xs">{feature.desc}</p>
+            <h4 className="text-white font-medium mb-1.5">{feature.title}</h4>
+            <p className="text-slate-400 text-xs leading-relaxed">{feature.desc}</p>
           </motion.div>
         ))}
       </div>
