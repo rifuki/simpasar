@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Lightbulb, AlertTriangle, TrendingUp } from "lucide-react";
+import { Lightbulb, AlertTriangle, TrendingUp, Handshake, Footprints, AlertOctagon } from "lucide-react";
 import { formatRupiah } from "../../lib/utils";
 import type { SimulationResult } from "@shared/types";
 
@@ -126,7 +126,7 @@ export function SummaryCard({ result }: Props) {
 
       {/* Risks & Opportunities */}
       <div className="grid grid-cols-2 gap-4">
-        <div>
+        <div className="bg-slate-900/40 rounded-xl p-4 border border-red-500/10">
           <p className="flex items-center gap-2 text-xs font-medium text-red-400 mb-3">
             <AlertTriangle className="w-4 h-4" /> Risiko Utama
           </p>
@@ -139,7 +139,7 @@ export function SummaryCard({ result }: Props) {
             ))}
           </ul>
         </div>
-        <div>
+        <div className="bg-slate-900/40 rounded-xl p-4 border border-emerald-500/10">
           <p className="flex items-center gap-2 text-xs font-medium text-emerald-400 mb-3">
             <TrendingUp className="w-4 h-4" /> Peluang
           </p>
@@ -152,6 +152,56 @@ export function SummaryCard({ result }: Props) {
             ))}
           </ul>
         </div>
+      </div>
+
+      {/* Strategic Intelligence (NEW) */}
+      <div className="pt-4 border-t border-slate-700/50 space-y-4">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Strategic Intelligence</h3>
+        
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-slate-900/60 rounded-xl p-3">
+            <div className="flex items-center gap-2 text-[10px] text-slate-500 mb-2">
+              <Handshake className="w-3.5 h-3.5 text-blue-400" /> SENTIMEN
+            </div>
+            <div className="flex gap-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div className="bg-emerald-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.positive.length || 1) * 33}%` }} />
+              <div className="bg-slate-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.neutral.length || 1) * 33}%` }} />
+              <div className="bg-red-500 h-full" style={{ width: `${(summary.sentimentAnalysis?.negative.length || 1) * 33}%` }} />
+            </div>
+            <p className="text-[10px] text-slate-400 mt-2 italic line-clamp-1">
+              "{summary.overallRecommendation.split('.')[0]}"
+            </p>
+          </div>
+
+          <div className="bg-slate-900/60 rounded-xl p-3">
+            <div className="flex items-center gap-2 text-[10px] text-slate-500 mb-2">
+              <Footprints className="w-3.5 h-3.5 text-orange-400" /> FOOT TRAFFIC
+            </div>
+            <div className="text-sm font-bold text-white capitalize">
+              {summary.footTrafficImpact || "Medium"}
+            </div>
+            <div className="text-[9px] text-slate-500 mt-1 uppercase">Impact Level</div>
+          </div>
+
+          <div className="bg-slate-900/60 rounded-xl p-3 border border-red-500/20">
+            <div className="flex items-center gap-2 text-[10px] text-red-400 mb-2">
+              <AlertOctagon className="w-3.5 h-3.5" /> BACKFIRE ALERTS
+            </div>
+            <div className="text-sm font-bold text-red-500">
+              {summary.backfireWarnings?.length || 0}
+            </div>
+            <div className="text-[9px] text-slate-500 mt-1 uppercase">Potential Blunders</div>
+          </div>
+        </div>
+
+        {summary.backfireWarnings && summary.backfireWarnings.length > 0 && (
+          <div className="bg-red-500/5 border border-red-500/10 rounded-lg p-3">
+            <p className="text-[10px] text-red-400 font-bold mb-1 uppercase tracking-tighter">⚠️ Backfire Warning</p>
+            <p className="text-[11px] text-slate-400 leading-tight">
+              {summary.backfireWarnings[0]}
+            </p>
+          </div>
+        )}
       </div>
     </motion.div>
   );

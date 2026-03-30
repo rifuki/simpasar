@@ -27,7 +27,7 @@ chatRoute.post("/", async (c) => {
   try {
     const { callLLM } = await import("../services/claudeService");
 
-    const systemPrompt = `Kamu adalah AI Market Consultant untuk platform SimPasar — platform simulasi pasar B2B berbasis data konsumen Indonesia.
+    const systemPrompt = `Kamu adalah AI Market Consultant untuk platform PasarSim — platform simulasi pasar B2B berbasis data konsumen Indonesia.
 
 Kamu memiliki akses ke hasil simulasi berikut:
 

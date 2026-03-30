@@ -44,6 +44,8 @@ export interface SegmentResult {
   pricePerception: PricePerception;
   mainReason: string;
   personaCount: number;
+  sentiment: "positive" | "neutral" | "negative";
+  interestLevel: number; // 0-100
 }
 
 export interface PersonaSimResult {
@@ -77,6 +79,13 @@ export interface SimulationResult {
     overallRecommendation: string;
     keyRisks: string[];
     keyOpportunities: string[];
+    sentimentAnalysis: {
+      positive: string[];
+      negative: string[];
+      neutral: string[];
+    };
+    footTrafficImpact: "high" | "medium" | "low";
+    backfireWarnings: string[];
   };
   segmentBreakdown: SegmentResult[];
   personaDetails: PersonaSimResult[];
@@ -96,6 +105,36 @@ export interface City {
   economicProfile: string;
   avgMonthlyExpenditure: number;
   topIndustries: string[];
+}
+
+export interface Persona {
+  id: string;
+  cityId: string;
+  name: string;
+  age: number;
+  ageGroup: string;
+  gender: "male" | "female";
+  occupation: string;
+  incomeLevel: "low" | "lower-mid" | "mid" | "upper-mid" | "high";
+  monthlyIncome: number;
+  monthlyDisposable: number;
+  lifestyle: string[];
+  location: string;
+  shoppingBehavior: {
+    priceElasticity: "very_sensitive" | "sensitive" | "moderate" | "insensitive";
+    decisionFactor: string[];
+    preferredChannel: string[];
+    weeklyFnBSpend: number;
+  };
+  psychographic: {
+    values: string[];
+    mediaConsumption: string[];
+    peerInfluence: "low" | "medium" | "high";
+  };
+  cityContext: {
+    culturalNote: string;
+    competitorAwareness: string[];
+  };
 }
 
 export interface ApiError {

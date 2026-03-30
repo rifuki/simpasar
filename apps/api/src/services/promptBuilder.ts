@@ -1,6 +1,4 @@
-import type { SimulationRequest } from "../../../packages/shared/types";
-import type { Persona } from "../data/personas";
-import type { City } from "../data/cities";
+import type { SimulationRequest, City, Persona } from "../../../../packages/shared/types";
 
 export const SYSTEM_PROMPT = `You are a market research AI specializing in Indonesian consumer behavior.
 You analyze products based on real consumer persona profiles from specific Indonesian cities.
@@ -79,7 +77,14 @@ RESPOND WITH THIS EXACT JSON (no markdown, no code blocks, raw JSON only):
     },
     "overallRecommendation": "<1-2 kalimat ringkas dalam Bahasa Indonesia>",
     "keyRisks": ["<risiko 1>", "<risiko 2>", "<risiko 3>"],
-    "keyOpportunities": ["<peluang 1>", "<peluang 2>", "<peluang 3>"]
+    "keyOpportunities": ["<peluang 1>", "<peluang 2>", "<peluang 3>"],
+    "sentimentAnalysis": {
+      "positive": ["<hal positif 1>", "<hal positif 2>"],
+      "negative": ["<hal negatif 1>", "<hal negatif 2>"],
+      "neutral": ["<hal netral 1>", "<hal netral 2>"]
+    },
+    "footTrafficImpact": "<high|medium|low>",
+    "backfireWarnings": ["<peringatan potensi blunder 1>", "<peringatan potensi blunder 2>"]
   },
   "segmentBreakdown": [
     {
@@ -90,7 +95,9 @@ RESPOND WITH THIS EXACT JSON (no markdown, no code blocks, raw JSON only):
       "averageWeeklyFrequency": <number, berapa kali seminggu jika beli>,
       "pricePerception": "<too_cheap|cheap|fair|expensive|too_expensive>",
       "mainReason": "<1 kalimat dalam Bahasa Indonesia>",
-      "personaCount": <integer>
+      "personaCount": <integer>,
+      "sentiment": "<positive|neutral|negative>",
+      "interestLevel": <integer 0-100>
     }
   ],
   "personaDetails": [

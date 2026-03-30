@@ -1,7 +1,7 @@
 import { buildUserPrompt } from "./promptBuilder";
 import { getPersonasByCity, getCityById, getSetting, saveSimulation } from "../db/queries";
 import { callCodex } from "./codexService";
-import type { SimulationRequest, SimulationResult } from "../../../packages/shared/types";
+import type { SimulationRequest, SimulationResult } from "../../../../packages/shared/types";
 
 // ─── Provider: Anthropic SDK (direct API key) ────────────────────────────────
 

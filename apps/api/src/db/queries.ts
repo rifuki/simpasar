@@ -1,6 +1,5 @@
 import { db } from "./database";
-import type { City } from "../../../packages/shared/types";
-import type { Persona } from "../data/personas";
+import type { SimulationResult, SimulationRequest, City, Persona } from "../../../../packages/shared/types";
 
 // ─── City helpers ────────────────────────────────────────────────────────────
 

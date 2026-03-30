@@ -61,3 +61,8 @@ export function seedIfEmpty() {
   seedAll();
   console.log(`[seed] Done — ${cities.length} cities, ${personas.length} personas`);
 }
+
+// Auto-run if executed directly
+if (import.meta.main || !process.env.NODE_ENV) {
+  seedIfEmpty();
+}

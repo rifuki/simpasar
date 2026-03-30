@@ -39,9 +39,9 @@ paymentRoute.get("/checkout", async (c) => {
   const recipient = MERCHANT_WALLET;
   const amount = totalAmount;
   const splToken = IDRX_SPL_TOKEN;
-  const label = "SimPasar";
-  const message = `Top Up ${creditsRequested} Credit Market Simulasi`;
-  const memo = "simpasar_credit";
+  const label = "PasarSim";
+  const message = "Buying credits on PasarSim";
+  const memo = "pasarsim_credit";
 
   const url = encodeURL({ recipient, amount, splToken, reference, label, message, memo });
 

@@ -12,7 +12,7 @@ export function AdminDashboard() {
   return (
     <div className="p-8 max-w-5xl mx-auto w-full">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Dashboard SimPasar</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">Dashboard PasarSim</h1>
         <p className="text-slate-400">Ringkasan data dan aktivitas platform</p>
       </div>
 

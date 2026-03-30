@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { 
-  ArrowRight, Activity, Users, CheckCircle, Clock, Wallet, ShieldCheck, 
-  MapPin, BrainCircuit 
+  ArrowRight, Activity, Users, CheckCircle, MapPin, BrainCircuit, ShieldCheck 
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -20,7 +19,7 @@ export function LandingPage() {
               <Activity className="w-5 h-5 text-black" strokeWidth={2.5} />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-              SimPasar
+              PasarSim
             </span>
           </div>
           
@@ -53,31 +52,31 @@ export function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-8">
-              <BrainCircuit className="w-4 h-4" /> AI Market Simulation Engine
+              <BrainCircuit className="w-4 h-4" /> AI Consumer Simulation & Prediction
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-              Riset Pasar yang Biasanya 50 Juta dan 3 Bulan. <br/>
+              Validasi Ide Bisnis di Klaster Suburban <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                Sekarang 1 Menit.
+                Dalam 1 Menit.
               </span>
             </h1>
             <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Simulasikan respons pasar lokal menggunakan AI agent dari data konsumen nyata (Surabaya, Malang, Bandung, dll), bukan asumsi.
+              Simulasikan respons pasar menggunakan AI agent berbasis data demografi nyata di Jabodetabek (BSD, Gading Serpong, Depok, Bekasi).
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link 
                 to="/app" 
                 className="group flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 bg-white text-black text-lg font-bold rounded-full hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(52,211,153,0.4)] transition-all"
               >
-                Mulai Simulasi Gratis
+                Mulai Simulasi Sekarang
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <div className="mt-10 flex items-center justify-center gap-8 opacity-60">
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Bandung</span>
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Surabaya</span>
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Malang</span>
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Jogjakarta</span>
+              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Gading Serpong</span>
+              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> BSD City</span>
+              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Bekasi Timur</span>
+              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Depok</span>
             </div>
           </motion.div>
         </section>
@@ -86,23 +85,23 @@ export function LandingPage() {
         <section className="mb-32">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Kenapa 70% Bisnis Baru Gagal?</h2>
-            <p className="text-slate-400">Bukan karena produknya jelek. Tapi karena mereka mengandalkan <i>feeling</i>, bukan data.</p>
+            <p className="text-slate-400">Karena pelaku bisnis mengandalkan asusmsi, bukan data psikografi yang presisi.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <ProblemCard 
-              icon={<Users className="w-8 h-8 text-red-400" />}
-              title="Survei Teman Sendiri"
-              desc="Teman selalu bilang ide kamu bagus. Data tidak representatif dan bias tinggi."
+              icon={<Users className="w-8 h-8 text-emerald-400" />}
+              title="Hyper-Local Insights"
+              desc="Pahami perbedaan perilaku belanja warga BSD yang tech-savvy vs warga Bekasi yang value-oriented."
             />
             <ProblemCard 
-              icon={<Wallet className="w-8 h-8 text-orange-400" />}
-              title="Konsultan Terlalu Mahal"
-              desc="Market research tradisional butuh 50-500 juta. Itu menghabiskan modal awal bisnis kamu."
+              icon={<BrainCircuit className="w-8 h-8 text-cyan-400" />}
+              title="Backfire Warnings"
+              desc="AI kami mendeteksi potensi 'blunder' pemasaran sebelum kamu menghabiskan budget iklan."
             />
             <ProblemCard 
-              icon={<Clock className="w-8 h-8 text-blue-400" />}
-              title="Kehilangan Momentum"
-              desc="Riset butuh 3-6 bulan? Momentum pasar keburu hilang atau keduluan kompetitor."
+              icon={<Activity className="w-8 h-8 text-blue-400" />}
+              title="Foot Traffic Analysis"
+              desc="Estimasi dampak traffic fisik dan digital terhadap konversi penjualan produk kamu."
             />
           </div>
         </section>
@@ -111,22 +110,22 @@ export function LandingPage() {
         <section id="how-it-works" className="mb-32">
           <div className="flex flex-col md:flex-row items-center gap-16">
             <div className="flex-1">
-              <h2 className="text-3xl font-bold text-white mb-8">3 Langkah Validasi Bisnismu</h2>
+              <h2 className="text-3xl font-bold text-white mb-8">Intelligence Level Baru</h2>
               <div className="space-y-8">
                 <Step 
                   num="01" 
-                  title="Input Parameter Produk" 
-                  desc="Masukkan nama produk, harga, kategori, dan deskripsi singkat. Pilih kota target yang ingin disimulasikan."
+                  title="Target Klaster Spesifik" 
+                  desc="Pilih dari 4 klaster ekonomi kunci di Jabodetabek dengan karakteristik uni masing-masing."
                 />
                 <Step 
                   num="02" 
-                  title="AI Agent Mensimulasikan Pasar" 
-                  desc="30-50 persona konsumen AI (berbasis survei warga lokal) akan menguji dan bereaksi terhadap produk kamu."
+                  title="Deep Persona Simulation" 
+                  desc="20+ AI Agent (Mahasiswa UI, Pekerja Jababeka, IRT Gading Serpong) menguji kelayakan hargamu."
                 />
                 <Step 
                   num="03" 
-                  title="Dapatkan Insight Nyata" 
-                  desc="Lihat demand, penerimaan harga, proyeksi revenue, dan segmentasi usia/pendapatan dalam 60 detik."
+                  title="Willingness-to-Pay Map" 
+                  desc="Dapatkan heatmap harga maksimal yang rela dibayar oleh tiap segmen pasar."
                 />
               </div>
             </div>
@@ -138,22 +137,22 @@ export function LandingPage() {
                     <CheckCircle className="w-6 h-6 text-emerald-400" />
                   </div>
                   <div>
-                    <div className="text-white font-bold">Simulasi Selesai</div>
-                    <div className="text-emerald-400 text-sm">Matcha Latte di Malang</div>
+                    <div className="text-white font-bold text-lg tracking-tight">PasarSim</div>
+                    <div className="text-emerald-400 text-sm">Fine Dining di Gading Serpong</div>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
-                    <span className="text-slate-400">Market Penetration</span>
-                    <span className="text-2xl font-bold text-white">45%</span>
+                    <span className="text-slate-400">Market Sentiment</span>
+                    <span className="text-lg font-bold text-emerald-400">Sangat Positif</span>
                   </div>
                   <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
-                    <span className="text-slate-400">Est. Revenue / Bulan</span>
-                    <span className="text-lg font-bold text-emerald-400">Rp 50M - 80M</span>
+                    <span className="text-slate-400">Willingness To Pay</span>
+                    <span className="text-lg font-bold text-white">Rp 450k - 600k</span>
                   </div>
                   <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
-                    <span className="text-slate-400">Harga Optimal</span>
-                    <span className="text-lg font-bold text-white">Rp 22.000</span>
+                    <span className="text-slate-400">Backfire Risk</span>
+                    <span className="text-lg font-bold text-red-400">Rendah</span>
                   </div>
                 </div>
               </div>
@@ -164,29 +163,29 @@ export function LandingPage() {
         {/* Pricing */}
         <section id="pricing" className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Gunakan Solana Pay, Dapatkan Akses Bisnis</h2>
-            <p className="text-slate-400">Harga transparan. 1 Credit = 1 Simulasi.</p>
+            <h2 className="text-3xl font-bold text-white mb-4">Akses Instan ke Data Pasar Lokal</h2>
+            <p className="text-slate-400">Riset pasar profesional dengan harga terjangkau.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <PricingCard 
-              title="Free Trial"
-              price="0 IDRX"
-              features={["1 Simulasi Kota", "Insight Basic", "Tanpa Export", "Watermarked"]}
-              buttonText="Coba Gratis"
+              title="Individual"
+              price="Gratis"
+              features={["1 Simulasi / hari", "Insight Dasar", "Pilih 1 Kota", "Simpan Riwayat"]}
+              buttonText="Mulai Sekarang"
             />
             <PricingCard 
               isPopular
-              title="Pro Simulation"
-              price="1 Credit"
-              priceIdr="150.000 IDRX / prompt"
-              features={["Fitur Demografi Lengkap", "Rekapitulasi Harga AI", "Proyeksi Revenue", "Export PDF (Coming Soon)"]}
+              title="Professional"
+              price="75.000 IDR"
+              priceIdr="per credit / simulasi"
+              features={["Akses Semua Klaster", "Full Sentiment Analysis", "Backfire Warnings", "Willingness-to-Pay Map", "Export Report (PDF)"]}
               buttonText="Beli Credit (Solana Pay)"
             />
             <PricingCard 
-              title="Enterprise"
+              title="Business"
               price="Custom"
-              features={["Akses API", "Custom City Agents", "Prioritas Support", "Account Manager"]}
-              buttonText="Hubungi Kami"
+              features={["Custom Persona Library", "API Access", "Market Trends Predictor", "Dedicated Support"]}
+              buttonText="Hubungi Sales"
             />
           </div>
         </section>
@@ -197,9 +196,9 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto flex py-4 flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <Activity className="w-5 h-5 text-emerald-400" />
-            <span className="text-lg font-bold text-white">SimPasar</span>
+            <span className="text-lg font-bold text-white">PasarSim</span>
           </div>
-          <p className="text-slate-500 text-sm">© 2026 SimPasar. Dibangun tangguh untuk Indonesia.</p>
+          <p className="text-slate-500 text-sm">© 2026 PasarSim. Empowering Local Commerce.</p>
         </div>
       </footer>
     </div>

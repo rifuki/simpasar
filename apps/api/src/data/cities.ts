@@ -1,60 +1,49 @@
-import type { City } from "../../../packages/shared/types";
+import type { City } from "../../../../packages/shared/types";
 
 export const cities: City[] = [
   {
-    id: "malang",
-    name: "Malang",
-    province: "Jawa Timur",
+    id: "gading-serpong",
+    name: "Gading Serpong",
+    province: "Banten",
     tier: "2",
-    population: 843810,
+    population: 150000,
     economicProfile:
-      "Kota pelajar dengan 5+ universitas besar. Didominasi mahasiswa dan keluarga muda. Sangat price-sensitive namun terbuka terhadap tren F&B baru. Kompetisi minuman kopi/boba sangat tinggi. UMR sekitar 3.2 juta/bulan.",
-    avgMonthlyExpenditure: 2800000,
-    topIndustries: ["pendidikan", "F&B", "pariwisata", "retail"],
+      "Modern suburban hub. Upper-mid to high income. Sangat padat dengan F&B lifestyle, kafe tematik, dan pusat kuliner. Konsumen sangat dipengaruhi tren media sosial dan nilai estetika.",
+    avgMonthlyExpenditure: 6500000,
+    topIndustries: ["F&B", "Lifestyle", "Property", "Retail"],
   },
   {
-    id: "bandung",
-    name: "Bandung",
+    id: "bsd",
+    name: "BSD City",
+    province: "Banten",
+    tier: "1",
+    population: 450000,
+    economicProfile:
+      "Planned integrated city. High income, tech-hub (Digital Hub), dan keluarga muda mapan. Konsumen selektif, tech-savvy, dan memiliki daya beli tinggi untuk produk premium/sehat.",
+    avgMonthlyExpenditure: 8000000,
+    topIndustries: ["Teknologi", "F&B", "Pendidikan", "Kesehatan"],
+  },
+  {
+    id: "bekasi-timur",
+    name: "Bekasi Timur",
     province: "Jawa Barat",
     tier: "1",
-    population: 2510160,
+    population: 600000,
     economicProfile:
-      "Kota kreatif dan lifestyle. Konsumen Bandung sangat trend-conscious, melek media sosial, dan willing to pay premium untuk experience unik. F&B, fashion, dan beauty adalah kategori utama. UMR sekitar 3.5 juta/bulan.",
-    avgMonthlyExpenditure: 3500000,
-    topIndustries: ["fashion", "F&B", "kreatif", "teknologi"],
+      "Commuter & industrial hub. Sangat padat penduduk, didominasi kelas menengah-bawah hingga menengah. Konsumen sangat value-oriented dan price-sensitive. F&B mass-market sangat kuat.",
+    avgMonthlyExpenditure: 4500000,
+    topIndustries: ["Logistik", "Manufaktur", "Retail", "F&B"],
   },
   {
-    id: "surabaya",
-    name: "Surabaya",
-    province: "Jawa Timur",
-    tier: "1",
-    population: 2874699,
-    economicProfile:
-      "Kota bisnis terbesar kedua di Indonesia. Konsumen pragmatis dan business-minded. Daya beli lebih tinggi dari rata-rata kota tier 2. Keputusan pembelian lebih rasional (value-for-money). UMR sekitar 4.5 juta/bulan.",
-    avgMonthlyExpenditure: 4200000,
-    topIndustries: ["perdagangan", "industri", "logistik", "F&B"],
-  },
-  {
-    id: "yogyakarta",
-    name: "Yogyakarta",
-    province: "DI Yogyakarta",
+    id: "depok",
+    name: "Depok (Margonda)",
+    province: "Jawa Barat",
     tier: "2",
-    population: 422732,
+    population: 2000000,
     economicProfile:
-      "Kota budaya dan wisata. Mix antara mahasiswa, warga lokal budaya-conscious, dan wisatawan. Harga sangat sensitif untuk warga lokal, tapi wisatawan lebih fleksibel. Kompetisi kuliner sangat ketat. UMR sekitar 2.1 juta/bulan.",
-    avgMonthlyExpenditure: 2500000,
-    topIndustries: ["pariwisata", "pendidikan", "kuliner", "kerajinan"],
-  },
-  {
-    id: "semarang",
-    name: "Semarang",
-    province: "Jawa Tengah",
-    tier: "1",
-    population: 1653524,
-    economicProfile:
-      "Kota industri dan perdagangan. Konsumen lebih konservatif dan value-oriented dibanding Bandung/Surabaya. Tidak terlalu trend-driven, tapi daya beli solid. Kompetisi F&B masih lebih rendah dibanding kota besar lain. UMR sekitar 3.2 juta/bulan.",
-    avgMonthlyExpenditure: 3100000,
-    topIndustries: ["industri", "perdagangan", "logistik", "F&B"],
+      "Education & residential hub. Fokus di area Margonda yang didominasi mahasiswa (UI, Gunadarma) dan pekerja commuter. Market sangat dinamis, price-sensitive untuk harian, namun massif.",
+    avgMonthlyExpenditure: 5000000,
+    topIndustries: ["Pendidikan", "F&B", "Layanan Jasa", "Retail"],
   },
 ];
 

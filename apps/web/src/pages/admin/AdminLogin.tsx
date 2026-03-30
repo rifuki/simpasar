@@ -99,7 +99,7 @@ export function AdminLogin() {
         <div className="mt-8 text-center border-t border-white/10 pt-6">
           <div className="text-[10px] text-zinc-600 font-medium uppercase tracking-widest mt-2 flex items-center justify-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-            SimPasar Internal Operations
+            PasarSim Internal Operations
           </div>
         </div>
       </motion.div>
