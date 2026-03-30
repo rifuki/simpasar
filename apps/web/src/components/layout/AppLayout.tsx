@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { LayoutDashboard, Beaker, History, LogOut, ArrowLeft, Coins } from "lucide-react";
+import { LayoutDashboard, Grid3X3, History, LogOut, ArrowLeft, Coins } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import { useState } from "react";
 import { TopUpModal } from "../payment/TopUpModal";
@@ -40,7 +40,7 @@ export function AppLayout() {
           </NavLink>
           
           <NavLink
-            to="/app/simulate"
+            to="/app/cluster"
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
@@ -49,7 +49,7 @@ export function AppLayout() {
               }`
             }
           >
-            <Beaker className="w-5 h-5" /> Market Simulation
+            <Grid3X3 className="w-5 h-5" /> Market Cluster
           </NavLink>
 
           <NavLink
@@ -108,7 +108,7 @@ export function AppLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto relative">
+      <main className="flex-1 h-screen overflow-y-auto scrollbar-hide relative">
         {/* Subtle mesh/glow background behind everything */}
         <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
         <div className="absolute top-[-100px] left-[50%] -translate-x-1/2 w-[600px] h-[300px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"></div>

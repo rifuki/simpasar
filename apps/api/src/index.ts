@@ -3,10 +3,12 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { simulation } from "./routes/simulation";
 import { citiesRoute } from "./routes/cities";
+import clusterRoutes from "./routes/clusters";
 import { paymentRoute } from "./routes/payment";
 import { userRoute } from "./routes/user";
 import { faucetRoute } from "./routes/faucet";
 import { history } from "./routes/history";
+import { chatRoute } from "./routes/chat";
 import { adminPersonas } from "./routes/admin/personas";
 import { adminCities } from "./routes/admin/cities";
 import { adminSimulations } from "./routes/admin/simulations";
@@ -30,10 +32,12 @@ app.use(
 
 app.route("/api/simulation", simulation);
 app.route("/api/cities", citiesRoute);
+app.route("/api/clusters", clusterRoutes);
 app.route("/api/payment", paymentRoute);
 app.route("/api/user", userRoute);
 app.route("/api/faucet", faucetRoute);
 app.route("/api/history", history);
+app.route("/api/chat", chatRoute);
 app.route("/api/admin/personas", adminPersonas);
 app.route("/api/admin/cities", adminCities);
 app.route("/api/admin/simulations", adminSimulations);
@@ -56,4 +60,5 @@ app.onError((err, c) => {
 export default {
   port: Number(process.env.PORT) || 3001,
   fetch: app.fetch,
+  idleTimeout: 60,
 };

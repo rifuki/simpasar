@@ -1,7 +1,7 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUser } from "../../hooks/useUser";
 import { motion } from "framer-motion";
-import { PlusCircle, Beaker, MapPin, Zap, ArrowRight, Wallet } from "lucide-react";
+import { Beaker, MapPin, Zap, ArrowRight, Wallet } from "lucide-react";
 import { useState } from "react";
 import { TopUpModal } from "../../components/payment/TopUpModal";
 import { Link } from "react-router-dom";
@@ -40,14 +40,14 @@ export function AppDashboard() {
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-bold text-white tracking-tight mb-2"
           >
             Selamat Datang 👋
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
@@ -56,7 +56,7 @@ export function AppDashboard() {
             Simulasikan produk Anda sebelum launching ke pasar.
           </motion.p>
         </div>
-        
+
         <motion.button
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -64,14 +64,14 @@ export function AppDashboard() {
           onClick={() => setShowTopUp(true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-[#021A11] font-semibold text-sm transition-all shadow-lg hover:shadow-[0_0_15px_rgba(52,211,153,0.3)]"
         >
-          <span className="text-lg">💎</span> Top Up Saldo
+          Top Up Saldo
         </motion.button>
       </div>
 
       {/* Main Cards Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
         {/* Credit Card - Large */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="lg:col-span-1 bg-gradient-to-br from-emerald-900/40 to-emerald-950/20 border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden"
@@ -79,13 +79,13 @@ export function AppDashboard() {
           <div className="absolute top-0 right-0 p-6 opacity-20">
             <Wallet className="w-32 h-32 text-emerald-400" />
           </div>
-          
+
           <div className="relative z-10">
             <div className="text-emerald-400 text-sm font-medium mb-4 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               Saldo Credit Tersedia
             </div>
-            
+
             {isLoading ? (
               <div className="h-16 w-32 bg-white/5 animate-pulse rounded-lg" />
             ) : (
@@ -93,26 +93,30 @@ export function AppDashboard() {
                 {user?.credits || 0}
               </div>
             )}
-            
-            <div className="text-emerald-400/70 text-sm mt-2">credit tersisa</div>
-            
+
+            <div className="text-emerald-400/70 text-sm mt-2">
+              credit tersisa
+            </div>
+
             <div className="mt-6 pt-6 border-t border-emerald-500/20">
-              <div className="text-xs text-slate-400 mb-1">1 Simulasi = 1 Credit</div>
+              <div className="text-xs text-slate-400 mb-1">
+                1 Simulasi = 1 Credit
+              </div>
               <div className="text-xs text-slate-500">1 Kota = 1 Simulasi</div>
             </div>
           </div>
         </motion.div>
 
         {/* Quick Actions */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="lg:col-span-2 bg-[#111] border border-white/10 rounded-2xl p-6"
         >
           <h3 className="text-white font-semibold mb-6">Mulai Simulasi</h3>
-          
-          <Link 
+
+          <Link
             to="/app/simulate"
             className="group flex items-center justify-between p-5 bg-gradient-to-r from-emerald-500/10 to-transparent border border-emerald-500/20 rounded-xl hover:border-emerald-500/40 transition-all mb-4"
           >
@@ -132,7 +136,7 @@ export function AppDashboard() {
             <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
           </Link>
 
-          <Link 
+          <Link
             to="/app/history"
             className="group flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-all"
           >
@@ -164,7 +168,9 @@ export function AppDashboard() {
             transition={{ delay: 0.3 + index * 0.1 }}
             className="bg-[#111] border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all"
           >
-            <div className={`w-10 h-10 rounded-lg bg-${feature.color}-500/10 border border-${feature.color}-500/20 flex items-center justify-center mb-3`}>
+            <div
+              className={`w-10 h-10 rounded-lg bg-${feature.color}-500/10 border border-${feature.color}-500/20 flex items-center justify-center mb-3`}
+            >
               <feature.icon className={`w-5 h-5 text-${feature.color}-400`} />
             </div>
             <h4 className="text-white font-medium mb-1">{feature.title}</h4>

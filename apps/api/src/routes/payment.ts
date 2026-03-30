@@ -6,7 +6,10 @@ import BigNumber from "bignumber.js";
 
 export const paymentRoute = new Hono();
 
-const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+const connection = new Connection(
+  process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com",
+  "confirmed"
+);
 const MERCHANT_WALLET = new PublicKey(
   process.env.MERCHANT_WALLET_ADDRESS || "DhmwD7sVpL9m2QyEdb3d1ZRP1wRkM7qW48eBqR4ZJdb5"
 );
@@ -74,8 +77,13 @@ paymentRoute.get("/verify", async (c) => {
   try {
     console.log(`[payment/verify] Looking for transaction: ref=${refStr}`);
 
-    // Try without finality constraint for devnet reliability
-    const signatureInfo = await findReference(connection, reference, { finality: "confirmed" });
+    // Wrap findReference with timeout to avoid hanging on slow devnet
+    const signatureInfo = await Promise.race([
+      findReference(connection, reference, { finality: "confirmed" }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(Object.assign(new Error("timeout"), { name: "FindReferenceError" })), 8000)
+      ),
+    ]);
 
     console.log(`[payment/verify] Found signature: ${signatureInfo.signature}`);
 
@@ -119,8 +127,9 @@ paymentRoute.get("/verify", async (c) => {
       console.log(`[payment/verify] Transaction not found yet: ref=${refStr}`);
       return c.json({ status: "pending", message: "Transaction not found on chain yet" });
     }
-    console.error(`[payment/verify] Error:`, error);
-    return c.json({ status: "failed", error: error.message }, 400);
+    // RPC error or network issue — treat as pending, don't fail the whole flow
+    console.error(`[payment/verify] RPC error (treating as pending):`, error.message);
+    return c.json({ status: "pending", message: "RPC error, retrying..." });
   }
 });
 

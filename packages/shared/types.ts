@@ -102,3 +102,53 @@ export interface ApiError {
   error: string;
   message: string;
 }
+
+// Cluster Types (for Market Cluster feature)
+export type IndustryType = "fnb" | "beauty" | "fashion" | "retail" | "services";
+
+export interface Cluster {
+  id: string;
+  name: string;
+  city: string;
+  province: string;
+  industry: IndustryType;
+  industryLabel: string;
+  description: string;
+  marketSize: "large" | "medium" | "small";
+  competitionLevel: "high" | "medium" | "low";
+  avgSpending: number;
+  demographics: string;
+  keyInsights: string[];
+  icon: string;
+  color: string;
+  activePersonas: number;
+}
+
+export interface ClusterSimulationRequest {
+  product: {
+    name: string;
+    description: string;
+    price: number;
+    priceUnit: PriceUnit;
+  };
+  clusterId: string;
+  additionalContext?: string;
+  walletAddress?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: string;
+}
+
+export interface ChatSession {
+  sessionId: string;
+  simulationId: string;
+  clusterId: string;
+  startedAt: string;
+  expiresAt: string;
+  messages: ChatMessage[];
+  remainingSeconds: number;
+}

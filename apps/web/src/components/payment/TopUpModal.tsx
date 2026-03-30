@@ -71,24 +71,35 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
     }
   }, [isConfirmed, onSuccess, walletAddress, queryClient, showToast, statusData?.creditsAdded, creditsCount]);
 
-  // 3. Fetch IDRX Balance explicitly for inline validation
-  const { data: userBalance, isLoading: isBalanceLoading } = useQuery({
+  // 3. Fetch IDRX Balance — derive ATA directly, 1 RPC call
+  const { data: userBalance, isLoading: isBalanceLoading, isError: isBalanceError } = useQuery({
     queryKey: ["idrx_balance", publicKey?.toBase58(), checkout?.splToken],
     queryFn: async () => {
-      if (!publicKey || !checkout?.splToken) return 0;
+      if (!publicKey || !checkout?.splToken) return undefined;
+      const mintPubKey = new PublicKey(checkout.splToken);
+      const ata = getAssociatedTokenAddressSync(mintPubKey, publicKey, true);
+      console.log("[IDRX Balance] mint:", checkout.splToken, "| owner:", publicKey.toBase58(), "| ata:", ata.toBase58());
       try {
-        const response = await connection.getParsedTokenAccountsByOwner(publicKey, {
-          mint: new PublicKey(checkout.splToken),
-        });
-        if (response.value.length === 0) return 0;
-        const amountStr = response.value[0].account.data.parsed.info.tokenAmount.uiAmountString;
-        return parseFloat(amountStr || "0");
-      } catch (e) {
-        console.error("Failed fetching balance", e);
-        return 0;
+        const { value } = await connection.getTokenAccountBalance(ata);
+        console.log("[IDRX Balance] result:", value.uiAmountString);
+        return parseFloat(value.uiAmountString ?? "0");
+      } catch (e: any) {
+        console.warn("[IDRX Balance] ATA not found or error:", e?.message);
+        const errMsg = e?.message?.toLowerCase() || "";
+        
+        // Hanya return 0 jika kita yakin akun belum ada
+        if (errMsg.includes("could not find account") || errMsg.includes("invalid param") || errMsg.includes("not found")) {
+          return 0;
+        }
+        
+        // Jika karena koneksi/RPC jelek, throw error agar statusnya isError
+        throw e;
       }
     },
     enabled: !!publicKey && !!checkout?.splToken,
+    retry: 2,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const handleWalletPay = async () => {
@@ -154,13 +165,31 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
       console.log("Tx sent:", signature);
       // Backend polling will catch confirmation naturally
     } catch (err: any) {
-      console.error(err);
-      let errorMsg = "Gagal memproses transaksi. Pastikan saldo IDRX Devnet mencukupi.";
+      console.error("Wallet transaction error:", err);
+      let errorMsg = "Gagal memproses transaksi. Silakan coba lagi.";
       
-      if (err.name === "WalletSignTransactionError" || err.message?.toLowerCase().includes("user rejected")) {
-        errorMsg = "Transaksi dibatalkan. Anda membatalkan persetujuan di Wallet.";
-      } else if (err.message) {
-        errorMsg = err.message;
+      const errString = err?.toString()?.toLowerCase() || "";
+      const errMsg = err?.message?.toLowerCase() || "";
+      const errName = err?.name || "";
+
+      if (
+        errName === "WalletSignTransactionError" || 
+        errName === "WalletSendTransactionError" && (errMsg.includes("reject") || errMsg.includes("cancel") || errMsg.includes("denied")) ||
+        errMsg.includes("user rejected") || 
+        errString.includes("user rejected") ||
+        errMsg.includes("reject") || 
+        errString.includes("reject") ||
+        errMsg.includes("cancel") || 
+        errString.includes("cancel") ||
+        errMsg.includes("denied") ||
+        errString.includes("denied") ||
+        errString.includes("user cancelled")
+      ) {
+        errorMsg = "Transaksi dibatalkan. Anda menolak persetujuan di Wallet.";
+      } else if (err?.message) {
+        errorMsg = `Gagal: ${err.message}`;
+      } else if (typeof err === "string") {
+        errorMsg = `Gagal: ${err}`;
       }
       
       setSendError(errorMsg);
@@ -313,6 +342,8 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
                         <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-5 h-5 rounded-full bg-white/10" />
                         {isBalanceLoading ? (
                           <Loader2 className="w-4 h-4 animate-spin text-zinc-600" />
+                        ) : isBalanceError ? (
+                          <span className="text-red-400 font-medium text-xs">Gagal memuat network</span>
                         ) : (
                           <span className="text-white font-bold leading-none">{userBalance !== undefined ? userBalance.toLocaleString("id-ID") : "0"}</span>
                         )}
@@ -335,7 +366,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
                     </div>
                   )}
 
-                  {userBalance !== undefined && userBalance < checkout.amount && !sendError && (
+                  {userBalance !== undefined && userBalance !== null && userBalance < checkout.amount && !sendError && (
                     <div className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-2.5 rounded-xl w-full text-left font-medium leading-relaxed">
                       Saldo Anda kurang. Harap isi dari <a href="/faucet" target="_blank" className="font-bold underline hover:text-amber-300">Faucet</a>.
                     </div>
@@ -343,7 +374,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
 
                   <button
                     onClick={handleWalletPay}
-                    disabled={isSending || (userBalance !== undefined && userBalance < checkout.amount)}
+                    disabled={isSending || (userBalance !== undefined && userBalance !== null && userBalance < checkout.amount)}
                     className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-b from-emerald-400 to-emerald-600 text-[#021A11] font-bold shadow-[0_5px_20px_rgba(52,211,153,0.2)] hover:shadow-[0_8px_30px_rgba(52,211,153,0.3)] disabled:opacity-40 disabled:hover:shadow-none transition-all flex items-center justify-center gap-2 mt-auto"
                   >
                     {isSending ? (

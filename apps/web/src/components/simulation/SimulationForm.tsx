@@ -177,6 +177,7 @@ export function SimulationForm({ onSubmit, isLoading }: Props) {
           <label className="block text-sm font-medium text-slate-300 mb-1.5">
             Kota Target (Bisa pilih lebih dari satu)
             <span className="ml-2 text-xs text-slate-500">({targetCities.length} kota = {targetCities.length} Credit)</span>
+            <span className="ml-2 text-xs text-slate-600" title="Tier 1: Kota besar (Surabaya, Bandung) | Tier 2: Kota menengah (Malang, Yogyakarta)">ⓘ Tier?</span>
           </label>
           
           <div 

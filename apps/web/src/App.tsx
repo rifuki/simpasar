@@ -19,6 +19,7 @@ import { AppLogin } from "./pages/app/AppLogin";
 import { AppDashboard } from "./pages/app/AppDashboard";
 import { HistoryPage } from "./pages/app/HistoryPage";
 import { SimulationPage } from "./pages/SimulationPage";
+import { MarketClusterPage } from "./pages/MarketClusterPage";
 
 // Services & Guards
 import { getAdminKey } from "./lib/adminApi";
@@ -52,7 +53,9 @@ export default function App() {
             }>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard" element={<AppDashboard />} />
-              <Route path="simulate" element={<SimulationPage />} />
+              <Route path="simulate" element={<Navigate to="/app/cluster" replace />} />
+              <Route path="cluster" element={<MarketClusterPage />} />
+              <Route path="cluster" element={<MarketClusterPage />} />
               <Route path="history" element={<HistoryPage />} />
             </Route>
             

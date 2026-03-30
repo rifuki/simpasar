@@ -7,7 +7,10 @@ import path from "path";
 
 export const faucetRoute = new Hono();
 
-const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+const connection = new Connection(
+  process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com",
+  "confirmed"
+);
 
 faucetRoute.post("/idrx", async (c) => {
   try {

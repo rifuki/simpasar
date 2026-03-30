@@ -56,7 +56,7 @@ async function callNaisu(systemPrompt: string, userPrompt: string): Promise<stri
 
 // ─── Router ──────────────────────────────────────────────────────────────────
 
-async function callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
+export async function callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
   const provider = process.env.LLM_PROVIDER || "anthropic";
 
   switch (provider) {
@@ -85,18 +85,30 @@ function extractJson(text: string): string {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-export async function runSimulation(request: SimulationRequest): Promise<SimulationResult> {
+export type ProgressCallback = (step: string, label: string) => void;
+
+export async function runSimulation(
+  request: SimulationRequest,
+  onProgress?: ProgressCallback
+): Promise<SimulationResult> {
+  onProgress?.("validating", "Memvalidasi data produk...");
+
   const city = getCityById(request.targetCity);
   if (!city) throw new Error(`City '${request.targetCity}' not found`);
 
+  onProgress?.("loading_personas", "Memuat profil konsumen...");
   const personas = getPersonasByCity(request.targetCity);
   if (personas.length === 0)
     throw new Error(`No personas found for city '${request.targetCity}'`);
 
+  onProgress?.("building_prompt", "Menganalisis daya beli pasar...");
   const systemPrompt = getSetting("system_prompt") ?? (await import("./promptBuilder")).SYSTEM_PROMPT;
   const userPrompt = buildUserPrompt(request, city, personas);
+
+  onProgress?.("running_ai", "Mensimulasikan keputusan pembelian...");
   const rawText = await callLLM(systemPrompt, userPrompt);
 
+  onProgress?.("parsing", "Menghitung penetrasi pasar...");
   const jsonStr = extractJson(rawText);
   const parsed = JSON.parse(jsonStr) as {
     summary: SimulationResult["summary"] & { marketPenetration?: number };
@@ -105,9 +117,10 @@ export async function runSimulation(request: SimulationRequest): Promise<Simulat
   };
 
   // Always calculate marketPenetration server-side
-  const buyCount = parsed.personaDetails.filter((p) => p.decision === "buy").length;
+  const buyCount = parsed.personaDetails.filter((p: { decision: string }) => p.decision === "buy").length;
   const marketPenetration = Math.round((buyCount / parsed.personaDetails.length) * 100);
 
+  onProgress?.("saving", "Menyusun rekomendasi...");
   const result: SimulationResult = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),

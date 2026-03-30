@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { streamSSE } from "hono/streaming";
 import { zValidator } from "@hono/zod-validator";
 import { simulationRequestSchema } from "../schemas/simulationSchema";
 import { runSimulation } from "../services/claudeService";
@@ -19,16 +20,21 @@ simulation.post("/run", zValidator("json", simulationRequestSchema), async (c) =
     return c.json({ error: "INSUFFICIENT_CREDITS", message: "You need at least 1 credit to run simulation. Please Top Up." }, 402);
   }
 
-  try {
-    const result = await runSimulation(body);
-    
-    // Deduct credit
-    db.run("UPDATE users SET credits = credits - 1 WHERE wallet_address = ?", [body.walletAddress]);
+  return streamSSE(c, async (stream) => {
+    try {
+      const result = await runSimulation(body, (step, label) => {
+        // Fire and forget — we don't await to avoid blocking the main thread
+        stream.writeSSE({ event: "progress", data: JSON.stringify({ step, label }) }).catch(() => {});
+      });
 
-    return c.json(result);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Terjadi kesalahan saat menjalankan simulasi";
-    console.error("[simulation/run]", err);
-    return c.json({ error: "SIMULATION_FAILED", message }, 500);
-  }
+      // Deduct credit
+      db.run("UPDATE users SET credits = credits - 1 WHERE wallet_address = ?", [body.walletAddress ?? ""]);
+
+      await stream.writeSSE({ event: "result", data: JSON.stringify({ success: true, data: result }) });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Terjadi kesalahan saat menjalankan simulasi";
+      console.error("[simulation/run]", err);
+      await stream.writeSSE({ event: "error", data: JSON.stringify({ error: "SIMULATION_FAILED", message }) });
+    }
+  });
 });
