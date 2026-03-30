@@ -107,14 +107,14 @@ export function LandingPage() {
         {/* Problem Section */}
         <section className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">65.5 Juta UMKM, Rp 0 Data Lokal.</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">65.5 Juta UMKM, 0 Akses Data Pasar Lokal.</h2>
             <p className="text-slate-400">Pemilik bisnis membuang ratusan juta membuka cabang hanya bermodalkan "Gut Feel" (insting).</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <ProblemCard 
               icon={<Users className="w-8 h-8 text-emerald-400" />}
               title="Hyper-Local Insights"
-              desc="Pahami perbedaan perilaku belanja warga BSD yang tech-savvy vs warga Bekasi yang value-oriented."
+              desc="Pahami perbedaan perilaku belanja spesifik pada masing-masing klaster tanpa mengandalkan asumsi umum."
             />
             <ProblemCard 
               icon={<BrainCircuit className="w-8 h-8 text-cyan-400" />}
@@ -143,7 +143,7 @@ export function LandingPage() {
                 <Step 
                   num="02" 
                   title="Deep Persona Simulation" 
-                  desc="20+ AI Agent (Mahasiswa UI, Pekerja Jababeka, IRT Gading Serpong) menguji kelayakan hargamu."
+                  desc="Puluhan AI Agent dengan profil demografi nyata dari tiap klaster menguji kelayakan ide dan hargamu."
                 />
                 <Step 
                   num="03" 
@@ -161,7 +161,7 @@ export function LandingPage() {
                   </div>
                   <div>
                     <div className="text-white font-bold text-lg tracking-tight">PasarSim</div>
-                    <div className="text-emerald-400 text-sm">Fine Dining di Gading Serpong</div>
+                    <div className="text-emerald-400 text-sm">Coffee Shop Premium (Contoh Simulasi)</div>
                   </div>
                 </div>
                 <div className="space-y-4">
