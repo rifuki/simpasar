@@ -1,11 +1,32 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUser } from "../../hooks/useUser";
 import { motion } from "framer-motion";
-import { Coins, Activity, TrendingUp, Zap } from "lucide-react";
+import { Coins, Beaker, MapPin, Zap, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { TopUpModal } from "../../components/payment/TopUpModal";
 import { Link } from "react-router-dom";
 import { useToast } from "../../components/ui/Toast";
+
+const FEATURES = [
+  {
+    icon: MapPin,
+    title: "Multi-Kota",
+    desc: "Bandung, Malang, Surabaya, Semarang, Yogyakarta",
+    color: "blue",
+  },
+  {
+    icon: Beaker,
+    title: "AI Persona",
+    desc: "50+ profil konsumen realistis per kota",
+    color: "purple",
+  },
+  {
+    icon: Zap,
+    title: "Instan",
+    desc: "Hasil analisis dalam 30-60 detik",
+    color: "amber",
+  },
+];
 
 export function AppDashboard() {
   const { publicKey } = useWallet();
@@ -16,106 +37,149 @@ export function AppDashboard() {
 
   return (
     <div className="max-w-5xl mx-auto py-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      {/* Welcome Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Platform Overview</h1>
-          <p className="text-slate-400 text-sm">Monitor pemakaian simulasi dan atur modal wallet Anda.</p>
+          <motion.h1 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-bold text-white tracking-tight mb-2"
+          >
+            Selamat Datang 👋
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-slate-400 text-sm"
+          >
+            Simulasikan produk Anda sebelum launching ke pasar.
+          </motion.p>
         </div>
         
-        <button
+        <motion.button
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
           onClick={() => setShowTopUp(true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-[#021A11] font-semibold text-sm transition-all shadow-lg hover:shadow-[0_0_15px_rgba(52,211,153,0.3)]"
         >
           <Coins className="w-4 h-4" /> Top Up Saldo
-        </button>
+        </motion.button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {/* Credit Card */}
+      {/* Main Cards Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+        {/* Credit Card - Large */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="col-span-1 md:col-span-1 bg-[#111] border border-white/10 rounded-[1.5rem] p-6 relative overflow-hidden group"
+          className="lg:col-span-1 bg-gradient-to-br from-emerald-900/40 to-emerald-950/20 border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Coins className="w-24 h-24 text-emerald-400" />
-          </div>
-          <div className="text-slate-400 text-sm font-medium mb-4 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-            Sisa Credit Simulasi
+          <div className="absolute top-0 right-0 p-6 opacity-20">
+            <Coins className="w-32 h-32 text-emerald-400" />
           </div>
           
-          {isLoading ? (
-            <div className="h-10 w-24 bg-white/5 animate-pulse rounded-lg mt-2"></div>
-          ) : (
-            <div className="text-5xl font-black text-white tracking-tighter mt-1 drop-shadow-sm">
-              {user?.credits || 0}
+          <div className="relative z-10">
+            <div className="text-emerald-400 text-sm font-medium mb-4 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Saldo Credit Tersedia
             </div>
-          )}
-          
-          <div className="text-xs text-slate-500 mt-4">1 Simulasi = 1 Credit</div>
+            
+            {isLoading ? (
+              <div className="h-16 w-32 bg-white/5 animate-pulse rounded-lg" />
+            ) : (
+              <div className="text-6xl font-black text-white tracking-tighter">
+                {user?.credits || 0}
+              </div>
+            )}
+            
+            <div className="text-emerald-400/70 text-sm mt-2">credit tersisa</div>
+            
+            <div className="mt-6 pt-6 border-t border-emerald-500/20">
+              <div className="text-xs text-slate-400 mb-1">1 Simulasi = 1 Credit</div>
+              <div className="text-xs text-slate-500">1 Kota = 1 Simulasi</div>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Info Card 1 */}
+        {/* Quick Actions */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="col-span-1 md:col-span-1 bg-[#111] border border-white/10 rounded-[1.5rem] p-6"
+          className="lg:col-span-2 bg-[#111] border border-white/10 rounded-2xl p-6"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
-            <Activity className="w-5 h-5 text-blue-400" />
-          </div>
-          <div className="text-slate-400 text-sm font-medium mb-1">Status Sistem</div>
-          <div className="text-xl font-bold text-white">Online & Akurat</div>
-          <p className="text-xs text-slate-500 mt-4 line-clamp-2">Database AI tersinkronisasi dengan data sentimen pasar minggu ini.</p>
-        </motion.div>
+          <h3 className="text-white font-semibold mb-6">Mulai Simulasi</h3>
+          
+          <Link 
+            to="/app/simulate"
+            className="group flex items-center justify-between p-5 bg-gradient-to-r from-emerald-500/10 to-transparent border border-emerald-500/20 rounded-xl hover:border-emerald-500/40 transition-all mb-4"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <Beaker className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div>
+                <div className="text-white font-semibold group-hover:text-emerald-400 transition-colors">
+                  Simulasi Baru
+                </div>
+                <div className="text-slate-400 text-sm">
+                  Analisis pasar untuk produk Anda
+                </div>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+          </Link>
 
-        {/* Info Card 2 */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="col-span-1 md:col-span-1 bg-[#111] border border-white/10 rounded-[1.5rem] p-6"
-        >
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
-            <TrendingUp className="w-5 h-5 text-purple-400" />
-          </div>
-          <div className="text-slate-400 text-sm font-medium mb-1">Data Indexing</div>
-          <div className="text-xl font-bold text-white">2.5 Juta Entri</div>
-          <p className="text-xs text-slate-500 mt-4 line-clamp-2">Cakupan wilayah yang memadai untuk target pulau Jawa dan Bali.</p>
+          <Link 
+            to="/app/history"
+            className="group flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                <Zap className="w-6 h-6 text-blue-400" />
+              </div>
+              <div>
+                <div className="text-white font-semibold group-hover:text-blue-400 transition-colors">
+                  Riwayat Simulasi
+                </div>
+                <div className="text-slate-400 text-sm">
+                  Lihat hasil analisis sebelumnya
+                </div>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+          </Link>
         </motion.div>
       </div>
 
-      {/* Action Banner */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3 }}
-        className="w-full bg-gradient-to-br from-emerald-900/30 to-black border border-emerald-500/20 rounded-[2rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative"
-      >
-        <div className="absolute top-1/2 left-[80%] -translate-y-1/2 w-[300px] h-[300px] bg-emerald-500/10 blur-[80px] rounded-full mix-blend-screen pointer-events-none"></div>
-        <div className="z-10 text-center md:text-left">
-          <h2 className="text-2xl font-bold text-white mb-2">Siap mendominasi pasar?</h2>
-          <p className="text-slate-400 text-sm max-w-md">
-            Gunakan AI terbaru kami untuk membedah demografi konsumen dan hindari kesalahan fatal sebelum launching.
-          </p>
-        </div>
-        <Link 
-          to="/app/simulate" 
-          className="z-10 whitespace-nowrap px-6 py-3.5 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition-colors shadow-xl flex items-center gap-2"
-        >
-          <Zap className="w-5 h-5" /> Mulai Simulasi Baru
-        </Link>
-      </motion.div>
+      {/* Features Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {FEATURES.map((feature, index) => (
+          <motion.div
+            key={feature.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + index * 0.1 }}
+            className="bg-[#111] border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all"
+          >
+            <div className={`w-10 h-10 rounded-lg bg-${feature.color}-500/10 border border-${feature.color}-500/20 flex items-center justify-center mb-3`}>
+              <feature.icon className={`w-5 h-5 text-${feature.color}-400`} />
+            </div>
+            <h4 className="text-white font-medium mb-1">{feature.title}</h4>
+            <p className="text-slate-500 text-xs">{feature.desc}</p>
+          </motion.div>
+        ))}
+      </div>
 
-      {/* TopUp Modal controlled by Dashboard */}
+      {/* TopUp Modal */}
       {showTopUp && walletStr && (
         <TopUpModal
           walletAddress={walletStr}
           onSuccess={() => {
             setShowTopUp(false);
-            refetch(); // Force refresh credits
+            refetch();
             showToast("Credit berhasil ditambahkan!", "success");
           }}
           onClose={() => setShowTopUp(false)}
