@@ -5,6 +5,10 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  define: {
+    // Required to prevent error when @solana/spl-token uses Node.js globals via rollup
+    global: "globalThis",
+  },
   resolve: {
     alias: {
       "@shared": resolve(__dirname, "../../packages/shared"),

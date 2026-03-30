@@ -4,6 +4,13 @@
   body {
     @apply bg-[#0a0a0f] text-slate-300;
   }
+  
+  button, 
+  a, 
+  [role="button"],
+  .wallet-adapter-button {
+    cursor: pointer !important;
+  }
 }
 
 /* Override solana wallet button styles to match brand */

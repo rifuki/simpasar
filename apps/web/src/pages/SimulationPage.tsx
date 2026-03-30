@@ -8,28 +8,53 @@ import { PersonaTable } from "../components/results/PersonaTable";
 import { ArrowLeft } from "lucide-react";
 import { useRunSimulation } from "../hooks/useSimulation";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useUser } from "../hooks/useUser";
+import { TopUpModal } from "../components/payment/TopUpModal";
+import { useToast } from "../components/ui/Toast";
 import type { SimulationRequest, SimulationResult } from "@shared/types";
 
 export function SimulationPage() {
   const [result, setResult] = useState<SimulationResult | null>(null);
+  const [showTopUp, setShowTopUp] = useState(false);
   const { mutate, isPending, error } = useRunSimulation();
   const { publicKey } = useWallet();
+  const walletStr = publicKey?.toBase58();
+  const { data: user, refetch: refetchUser } = useUser(walletStr || null);
+  const { showToast } = useToast();
 
   const handleSubmit = (req: SimulationRequest) => {
+    if (user && user.credits < 1) {
+      showToast("Saldo credit tidak cukup. Silakan top up terlebih dahulu.", "error");
+      setShowTopUp(true);
+      return;
+    }
+
     setResult(null);
     if (publicKey) {
       req.walletAddress = publicKey.toBase58();
     }
     mutate(req, {
-      onSuccess: (data) => setResult(data),
+      onSuccess: (data) => {
+        setResult(data);
+        refetchUser(); // Refresh credits after deduction
+        showToast("Simulasi berhasil! 1 credit telah digunakan.", "success");
+      },
+      onError: (err) => {
+        if (err.message?.includes("INSUFFICIENT_CREDITS")) {
+          showToast("Saldo credit tidak cukup. Silakan top up terlebih dahulu.", "error");
+          setShowTopUp(true);
+        } else {
+          showToast(err.message || "Gagal menjalankan simulasi", "error");
+        }
+      },
     });
   };
 
   const handleReset = () => setResult(null);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto py-4 relative">
+      <div className="w-full">
         {/* Header */}
         <div className="text-center mb-10">
           <motion.div
@@ -114,6 +139,17 @@ export function SimulationPage() {
           )}
         </AnimatePresence>
       </div>
+
+      {showTopUp && walletStr && (
+        <TopUpModal 
+          walletAddress={walletStr} 
+          onSuccess={() => {
+            setShowTopUp(false);
+            refetchUser(); // update credit view automatically
+          }} 
+          onClose={() => setShowTopUp(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,39 +1,60 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, X, Wallet, QrCode } from "lucide-react";
 import { api } from "../../lib/api";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
+
+import { getAssociatedTokenAddressSync, createTransferCheckedInstruction, createAssociatedTokenAccountInstruction, getAccount } from "@solana/spl-token";
+import { Transaction, SystemProgram } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
+import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "../ui/Toast";
 
 interface TopUpModalProps {
   walletAddress: string;
   onSuccess: () => void;
+  onClose?: () => void;
 }
 
-export function TopUpModal({ walletAddress, onSuccess }: TopUpModalProps) {
+export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProps) {
   const queryClient = useQueryClient();
+  const { connection } = useConnection();
+  const { publicKey, sendTransaction } = useWallet();
+  const { showToast } = useToast();
+  
+  const [activeTab, setActiveTab] = useState<"wallet" | "qr">("wallet");
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState("");
+  const [creditsCount, setCreditsCount] = useState(1);
 
-  // 1. Fetch initial checkout URL
+  const PRICE_PER_CREDIT = 75000;
+
+  // 1. Fetch checkout details (re-runs when creditsCount changes)
   const { data: checkout, isLoading: isCheckoutLoading, isError: isCheckoutError } = useQuery({
-    queryKey: ["payment_checkout", walletAddress],
+    queryKey: ["payment_checkout", walletAddress, creditsCount],
     queryFn: async () => {
-      const res = await api.get(`/api/payment/checkout?wallet=${walletAddress}`);
-      return res as { url: string; reference: string; amount: number };
+      const res = await api.get(`/api/payment/checkout?wallet=${walletAddress}&credits=${creditsCount}`);
+      return res as { url: string; reference: string; amount: number; credits: number; recipient: string; splToken: string };
     },
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
 
-  // 2. Poll for payment status
+  // 2. Poll for payment status (Backend verification)
   const { data: statusData } = useQuery({
     queryKey: ["payment_status", checkout?.reference],
     queryFn: async () => {
       if (!checkout?.reference) return null;
       const res = await api.get(`/api/payment/verify?reference=${checkout.reference}`);
-      return res as { status: string; creditsAdded: number };
+      return res as { status: string; creditsAdded: number; currentCredits?: number };
     },
     enabled: !!checkout?.reference,
-    refetchInterval: (data) => {
-      if ((data as any)?.state?.data?.status === "confirmed") return false;
-      return 3000; // poll every 3 seconds
+    refetchInterval: (query) => {
+      // query.state.data is the returned data from queryFn
+      if (query.state.data?.status === "confirmed") return false;
+      return 3000;
     },
   });
 
@@ -41,72 +62,334 @@ export function TopUpModal({ walletAddress, onSuccess }: TopUpModalProps) {
 
   useEffect(() => {
     if (isConfirmed) {
-      // Invalidate user cache so credits refresh
       queryClient.invalidateQueries({ queryKey: ["user_me", walletAddress] });
+      showToast(`+${statusData?.creditsAdded ?? creditsCount} Credit berhasil ditambahkan!`, "success");
       const timer = setTimeout(() => {
         onSuccess();
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [isConfirmed, onSuccess, walletAddress, queryClient]);
+  }, [isConfirmed, onSuccess, walletAddress, queryClient, showToast, statusData?.creditsAdded, creditsCount]);
+
+  // 3. Fetch IDRX Balance explicitly for inline validation
+  const { data: userBalance, isLoading: isBalanceLoading } = useQuery({
+    queryKey: ["idrx_balance", publicKey?.toBase58(), checkout?.splToken],
+    queryFn: async () => {
+      if (!publicKey || !checkout?.splToken) return 0;
+      try {
+        const response = await connection.getParsedTokenAccountsByOwner(publicKey, {
+          mint: new PublicKey(checkout.splToken),
+        });
+        if (response.value.length === 0) return 0;
+        const amountStr = response.value[0].account.data.parsed.info.tokenAmount.uiAmountString;
+        return parseFloat(amountStr || "0");
+      } catch (e) {
+        console.error("Failed fetching balance", e);
+        return 0;
+      }
+    },
+    enabled: !!publicKey && !!checkout?.splToken,
+  });
+
+  const handleWalletPay = async () => {
+    if (!checkout || !publicKey) return;
+    setIsSending(true);
+    setSendError("");
+    
+    try {
+      const recipientPubKey = new PublicKey(checkout.recipient);
+      const splTokenPubKey = new PublicKey(checkout.splToken);
+      const referencePubKey = new PublicKey(checkout.reference);
+      const IDRX_DECIMALS = 6;
+      const rawAmount = new BigNumber(checkout.amount).multipliedBy(10 ** IDRX_DECIMALS).toNumber();
+
+      // Derive sender and recipient ATAs (allowOwnerOffCurve = true)
+      const senderATA = getAssociatedTokenAddressSync(splTokenPubKey, publicKey, true);
+      const recipientATA = getAssociatedTokenAddressSync(splTokenPubKey, recipientPubKey, true);
+
+      const tx = new Transaction();
+
+      // Create recipient ATA if it doesn't exist (first time)
+      try {
+        await getAccount(connection, recipientATA);
+      } catch {
+        tx.add(
+          createAssociatedTokenAccountInstruction(
+            publicKey,      // payer (buyer pays to create merchant ATA)
+            recipientATA,
+            recipientPubKey,
+            splTokenPubKey
+          )
+        );
+      }
+
+      // SPL transfer with decimals check
+      tx.add(
+        createTransferCheckedInstruction(
+          senderATA,
+          splTokenPubKey,
+          recipientATA,
+          publicKey,
+          rawAmount,
+          IDRX_DECIMALS
+        )
+      );
+
+      // Add reference key as no-op memo so backend can find this tx
+      tx.add(
+        new Transaction().add(...[
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: referencePubKey,
+            lamports: 0,
+          })
+        ]).instructions[0]
+      );
+
+      const { blockhash } = await connection.getLatestBlockhash();
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = publicKey;
+
+      const signature = await sendTransaction(tx, connection);
+      console.log("Tx sent:", signature);
+      // Backend polling will catch confirmation naturally
+    } catch (err: any) {
+      console.error(err);
+      let errorMsg = "Gagal memproses transaksi. Pastikan saldo IDRX Devnet mencukupi.";
+      
+      if (err.name === "WalletSignTransactionError" || err.message?.toLowerCase().includes("user rejected")) {
+        errorMsg = "Transaksi dibatalkan. Anda membatalkan persetujuan di Wallet.";
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
+      setSendError(errorMsg);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 p-8 rounded-3xl max-w-sm w-full shadow-2xl relative overflow-hidden">
-        {/* Glow effect */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[#0a0a0f] border border-white/10 p-6 md:p-8 rounded-[2rem] max-w-sm w-full shadow-[0_0_80px_rgba(0,0,0,0.8)] relative overflow-hidden"
+      >
+        {/* Glow & BG */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
 
-        <div className="text-center mb-6 relative z-10">
-          <h2 className="text-2xl font-bold text-white mb-2">Top Up Credit</h2>
-          <p className="text-slate-400 text-sm">
-            Scan via Phantom atau Solflare (Devnet). Harga: <strong className="text-emerald-400">15.000 IDRX</strong>
-          </p>
+        {/* Close Button */}
+        {onClose && !isConfirmed && (
+          <button 
+            onClick={onClose}
+            className="absolute top-5 right-5 z-20 p-2 text-zinc-500 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+
+        <div className="text-center mb-5 relative z-10 w-[90%] mx-auto">
+          <h2 className="text-2xl font-bold text-white mb-1 tracking-tight">Top Up Credit</h2>
+          <p className="text-zinc-500 text-xs">1 Credit = 1 Simulasi Pasar</p>
         </div>
 
-        <div className="bg-[#12121a] border border-white/5 p-4 rounded-2xl flex justify-center items-center mb-6 min-h-[250px] relative z-10">
-          {isCheckoutLoading ? (
-            <div className="flex flex-col items-center gap-3 text-slate-500">
-              <Loader2 className="w-8 h-8 animate-spin" />
-              <span>Membuat QR Code...</span>
-            </div>
-          ) : isCheckoutError || !checkout ? (
-            <div className="flex flex-col items-center gap-3 text-red-500">
-              <XCircle className="w-8 h-8" />
-              <span>Gagal memuat pembayaran</span>
-            </div>
-          ) : isConfirmed ? (
-            <div className="flex flex-col items-center gap-4 text-emerald-400">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-10 h-10" />
-              </div>
-              <div className="text-lg font-bold text-white">Pembayaran Berhasil!</div>
-              <div className="text-sm text-slate-400">+1 Credit Ditambahkan</div>
-            </div>
-          ) : (
-            <div className="bg-white p-2 rounded-xl">
-              <QRCodeSVG 
-                value={checkout.url} 
-                size={200}
-                level="Q"
-                includeMargin={false}
-              />
-            </div>
-          )}
-        </div>
-
+        {/* Credit Quantity Picker */}
         {!isConfirmed && (
-          <div className="text-center relative z-10 mt-4 space-y-3">
-            <div className="inline-flex items-center gap-2 text-sm text-slate-400 bg-white/5 px-4 py-2 rounded-full">
-              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
-              Menunggu pembayaran...
+          <div className="relative z-10 mb-5">
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2 px-1">Jumlah Credit</p>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {[1, 3, 5, 10].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setCreditsCount(n)}
+                  className={`py-2 rounded-xl text-sm font-bold border transition-all ${
+                    creditsCount === n
+                      ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
+                      : "bg-white/5 border-white/10 text-zinc-400 hover:border-white/20 hover:text-white"
+                  }`}
+                >
+                  {n}x
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 bg-[#111] border border-white/5 rounded-xl px-4 py-2.5">
+              <button
+                onClick={() => setCreditsCount(c => Math.max(1, c - 1))}
+                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold transition-colors flex items-center justify-center text-lg leading-none"
+              >−</button>
+              <div className="flex-1 text-center">
+                <span className="text-white font-bold text-lg">{creditsCount}</span>
+                <span className="text-zinc-500 text-xs ml-1">credit</span>
+              </div>
+              <button
+                onClick={() => setCreditsCount(c => Math.min(100, c + 1))}
+                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold transition-colors flex items-center justify-center text-lg leading-none"
+              >+</button>
+            </div>
+            <div className="flex justify-between items-center mt-3 px-1">
+              <span className="text-zinc-500 text-xs">@75.000 IDRX / credit</span>
+              <span className="text-emerald-400 font-bold text-sm">
+                Total: {(creditsCount * PRICE_PER_CREDIT).toLocaleString("id-ID")} IDRX
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Tabs */}
+        {!isConfirmed && (
+          <div className="flex bg-[#111] p-1 rounded-xl mb-6 relative z-10 border border-white/5 shadow-inner">
+            <button
+              onClick={() => setActiveTab("wallet")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1 transition-all ${
+                activeTab === "wallet" 
+                  ? "bg-white text-black shadow-md" 
+                  : "text-zinc-500 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Wallet className="w-4 h-4" /> Bayar Wallet
+            </button>
+            <button
+              onClick={() => setActiveTab("qr")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1 transition-all ${
+                activeTab === "qr" 
+                  ? "bg-white text-black shadow-md" 
+                  : "text-zinc-500 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <QrCode className="w-4 h-4" /> Scan QR
+            </button>
+          </div>
+        )}
+
+        {/* Payment Content View */}
+        <div className="relative z-10">
+          <AnimatePresence mode="wait">
+            
+            {/* Loading checkout state */}
+            {isCheckoutLoading && (
+              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-10 gap-3 text-zinc-500 min-h-[220px]">
+                <Loader2 className="w-8 h-8 animate-spin" />
+                <span className="text-sm font-medium">Memverifikasi Harga...</span>
+              </motion.div>
+            )}
+
+            {/* Error state */}
+            {(isCheckoutError || (!isCheckoutLoading && !checkout)) && (
+              <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-10 gap-3 text-red-400 min-h-[220px]">
+                <XCircle className="w-10 h-10" />
+                <span className="text-sm">Gagal memuat saluran pembayaran</span>
+              </motion.div>
+            )}
+
+            {/* Success state */}
+            {isConfirmed ? (
+              <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-8 gap-5 text-emerald-400 min-h-[220px]">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full" />
+                  <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center relative z-10 border border-emerald-500/30">
+                    <CheckCircle2 className="w-12 h-12 text-emerald-400 drop-shadow-md" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-black text-white tracking-tight mb-1">Transaksi Berhasil!</div>
+                  <div className="text-sm text-emerald-400/80 font-medium">+{statusData?.creditsAdded ?? creditsCount} Credit Ditambahkan</div>
+                </div>
+              </motion.div>
+            ) : null}
+
+            {/* Wallet Pay Tab */}
+            {checkout && !isConfirmed && activeTab === "wallet" && (
+              <motion.div key="wallet" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col min-h-[220px]">
+                <div className="bg-[#111] border border-white/5 rounded-2xl p-5 w-full flex-1 flex flex-col text-center justify-between gap-4">
+                  
+                  {/* Ledger Display */}
+                  <div className="w-full flex justify-between items-center bg-[#16161e] border border-white/10 rounded-xl p-4 shadow-inner">
+                    <div className="flex flex-col items-start text-left">
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Saldo IDRX Anda</span>
+                      <div className="flex items-center gap-2">
+                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-5 h-5 rounded-full bg-white/10" />
+                        {isBalanceLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-zinc-600" />
+                        ) : (
+                          <span className="text-white font-bold leading-none">{userBalance !== undefined ? userBalance.toLocaleString("id-ID") : "0"}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-px h-8 bg-white/10 mx-2"></div>
+
+                    <div className="flex flex-col items-end text-right">
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Total Tagihan</span>
+                      <div className="text-emerald-400 font-bold flex items-center gap-1.5 leading-none mt-1">
+                        {checkout.amount.toLocaleString("id-ID")} <span className="text-xs font-semibold">IDRX</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {sendError && (
+                    <div className="w-full bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-xs text-red-400 text-left">
+                      {sendError}
+                    </div>
+                  )}
+
+                  {userBalance !== undefined && userBalance < checkout.amount && !sendError && (
+                    <div className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-2.5 rounded-xl w-full text-left font-medium leading-relaxed">
+                      Saldo Anda kurang. Harap isi dari <a href="/faucet" target="_blank" className="font-bold underline hover:text-amber-300">Faucet</a>.
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleWalletPay}
+                    disabled={isSending || (userBalance !== undefined && userBalance < checkout.amount)}
+                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-b from-emerald-400 to-emerald-600 text-[#021A11] font-bold shadow-[0_5px_20px_rgba(52,211,153,0.2)] hover:shadow-[0_8px_30px_rgba(52,211,153,0.3)] disabled:opacity-40 disabled:hover:shadow-none transition-all flex items-center justify-center gap-2 mt-auto"
+                  >
+                    {isSending ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Otorisasi Wallet...</>
+                    ) : (
+                      "Setujui Pembayaran"
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* QR Scan Tab */}
+            {checkout && !isConfirmed && activeTab === "qr" && (
+              <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col min-h-[220px]">
+                <div className="bg-[#12121a] border border-white/5 p-4 rounded-2xl flex justify-center items-center flex-1">
+                  <div className="bg-white p-3 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                    <QRCodeSVG 
+                      value={checkout.url} 
+                      size={180}
+                      level="Q"
+                      includeMargin={false}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
+        </div>
+
+        {/* Footer info showing polling status if we have checkout data but no confirmation yet */}
+        {checkout && !isConfirmed && (
+          <div className="text-center relative z-10 mt-6 pt-5 border-t border-white/10 space-y-3">
+            <div className="inline-flex items-center gap-2 text-[13px] font-medium text-zinc-400 bg-[#111] border border-white/5 px-4 py-2 rounded-full shadow-inner">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[ping_1.5s_ease-in-out_infinite]"></span>
+              Sistem backend memonitor pembayaran...
             </div>
             
-            <p className="text-xs text-slate-500">
-              Tidak punya saldo IDRX Devnet? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">Ambil dari Faucet</a>
+            <p className="text-xs text-zinc-500">
+              Butuh saldo IDRX Devnet? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">Faucet Gratis</a>
             </p>
           </div>
         )}
-      </div>
+
+      </motion.div>
     </div>
   );
 }

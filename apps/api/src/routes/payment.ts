@@ -14,36 +14,43 @@ const MERCHANT_WALLET = new PublicKey(
 const IDRX_SPL_TOKEN = new PublicKey(
   process.env.IDRX_TOKEN_MINT || "HnBXnUjXgqM4R8sQwzC1qT4qQyQ7yvL6xK7uJ3y7vQ6a"
 );
-// Harga 1 credit = 15000 IDRX
-const PRICE_IDRX = new BigNumber(15000);
+// Harga 1 credit = 75000 IDRX
+const PRICE_IDRX = new BigNumber(75000);
 
 paymentRoute.get("/checkout", async (c) => {
   const buyerWalletStr = c.req.query("wallet");
   if (!buyerWalletStr) return c.json({ error: "Missing wallet parameter" }, 400);
 
+  const creditsRequested = Math.max(1, Math.min(100, parseInt(c.req.query("credits") || "1", 10)));
+  const totalAmount = PRICE_IDRX.multipliedBy(creditsRequested);
+
   const reference = Keypair.generate().publicKey;
   const status = "pending";
   const now = new Date().toISOString();
 
-  // Reusing amount_sol column to store the numeric price
   db.run(
-    "INSERT INTO payments (reference, wallet_address, amount_sol, status, created_at) VALUES (?, ?, ?, ?, ?)",
-    [reference.toBase58(), buyerWalletStr, PRICE_IDRX.toNumber(), status, now]
+    "INSERT INTO payments (reference, wallet_address, amount_sol, credits_requested, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+    [reference.toBase58(), buyerWalletStr, totalAmount.toNumber(), creditsRequested, status, now]
   );
 
   const recipient = MERCHANT_WALLET;
-  const amount = PRICE_IDRX;
+  const amount = totalAmount;
   const splToken = IDRX_SPL_TOKEN;
   const label = "SimPasar";
-  const message = "Top Up 1 Credit Market Simulasi";
+  const message = `Top Up ${creditsRequested} Credit Market Simulasi`;
   const memo = "simpasar_credit";
 
   const url = encodeURL({ recipient, amount, splToken, reference, label, message, memo });
 
+  console.log(`[payment/checkout] Created payment: ref=${reference.toBase58()}, wallet=${buyerWalletStr}, credits=${creditsRequested}`);
+
   return c.json({
     url: url.toString(),
     reference: reference.toBase58(),
-    amount: PRICE_IDRX.toNumber()
+    amount: totalAmount.toNumber(),
+    credits: creditsRequested,
+    recipient: recipient.toBase58(),
+    splToken: splToken.toBase58()
   });
 });
 
@@ -55,37 +62,134 @@ paymentRoute.get("/verify", async (c) => {
   const payment = db.query("SELECT * FROM payments WHERE reference = ?").get(refStr) as any;
 
   if (!payment) return c.json({ error: "Payment request not found" }, 404);
+
+  // If already confirmed, return current user credits
   if (payment.status === "confirmed") {
-    return c.json({ status: "confirmed", creditsAdded: 0 });
+    const user = db.query("SELECT credits FROM users WHERE wallet_address = ?").get(payment.wallet_address) as any;
+    const currentCredits = user?.credits || 0;
+    console.log(`[payment/verify] Payment already confirmed: ref=${refStr}, currentCredits=${currentCredits}`);
+    return c.json({ status: "confirmed", creditsAdded: payment.credits_requested || 1, currentCredits });
   }
 
   try {
+    console.log(`[payment/verify] Looking for transaction: ref=${refStr}`);
+
+    // Try without finality constraint for devnet reliability
     const signatureInfo = await findReference(connection, reference, { finality: "confirmed" });
-    
-    await validateTransfer(
-      connection,
-      signatureInfo.signature,
-      { recipient: MERCHANT_WALLET, amount: PRICE_IDRX, splToken: IDRX_SPL_TOKEN, reference },
-      { commitment: "confirmed" }
-    );
-    
+
+    console.log(`[payment/verify] Found signature: ${signatureInfo.signature}`);
+
+    const expectedAmount = PRICE_IDRX.multipliedBy(payment.credits_requested);
+
+    try {
+      await validateTransfer(
+        connection,
+        signatureInfo.signature,
+        { recipient: MERCHANT_WALLET, amount: expectedAmount, splToken: IDRX_SPL_TOKEN, reference },
+        { commitment: "confirmed" }
+      );
+    } catch (validateError: any) {
+      console.error(`[payment/verify] Validation failed:`, validateError.message);
+      return c.json({ status: "validation_failed", error: validateError.message }, 400);
+    }
+
+    // Start transaction
     db.run("UPDATE payments SET status = 'confirmed' WHERE reference = ?", [refStr]);
-    
+
+    const creditsToAdd = payment.credits_requested || 1;
     const dbUser = db.query("SELECT credits FROM users WHERE wallet_address = ?").get(payment.wallet_address) as any;
+
+    let currentCredits: number;
     if (dbUser) {
-      db.run("UPDATE users SET credits = credits + 1 WHERE wallet_address = ?", [payment.wallet_address]);
+      db.run("UPDATE users SET credits = credits + ? WHERE wallet_address = ?", [creditsToAdd, payment.wallet_address]);
+      currentCredits = dbUser.credits + creditsToAdd;
+      console.log(`[payment/verify] Updated existing user: wallet=${payment.wallet_address}, added=${creditsToAdd}, total=${currentCredits}`);
     } else {
       db.run(
         "INSERT INTO users (wallet_address, credits, created_at) VALUES (?, ?, ?)",
-        [payment.wallet_address, 1, new Date().toISOString()]
+        [payment.wallet_address, creditsToAdd, new Date().toISOString()]
       );
+      currentCredits = creditsToAdd;
+      console.log(`[payment/verify] Created new user: wallet=${payment.wallet_address}, credits=${creditsToAdd}`);
     }
 
-    return c.json({ status: "confirmed", creditsAdded: 1 });
+    return c.json({ status: "confirmed", creditsAdded: creditsToAdd, currentCredits });
   } catch (error: any) {
     if (error.name === "FindReferenceError") {
-      return c.json({ status: "pending" });
+      console.log(`[payment/verify] Transaction not found yet: ref=${refStr}`);
+      return c.json({ status: "pending", message: "Transaction not found on chain yet" });
     }
+    console.error(`[payment/verify] Error:`, error);
     return c.json({ status: "failed", error: error.message }, 400);
   }
+});
+
+// Debug endpoint to check payment details
+paymentRoute.get("/debug/:reference", async (c) => {
+  const refStr = c.req.param("reference");
+  const payment = db.query("SELECT * FROM payments WHERE reference = ?").get(refStr) as any;
+
+  if (!payment) return c.json({ error: "Payment not found" }, 404);
+
+  const user = db.query("SELECT * FROM users WHERE wallet_address = ?").get(payment.wallet_address) as any;
+
+  return c.json({
+    payment: {
+      reference: payment.reference,
+      wallet_address: payment.wallet_address,
+      amount: payment.amount_sol,
+      credits_requested: payment.credits_requested,
+      status: payment.status,
+      created_at: payment.created_at,
+    },
+    user: user || null,
+  });
+});
+
+// Manual verify endpoint for admin (to fix stuck payments)
+paymentRoute.post("/admin/verify-manual", async (c) => {
+  // Simple auth check - in production use proper admin auth
+  const adminKey = c.req.header("x-admin-key");
+  if (adminKey !== process.env.ADMIN_KEY) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const body = await c.req.json();
+  const { reference: refStr } = body;
+
+  if (!refStr) return c.json({ error: "Missing reference" }, 400);
+
+  const payment = db.query("SELECT * FROM payments WHERE reference = ?").get(refStr) as any;
+  if (!payment) return c.json({ error: "Payment not found" }, 404);
+
+  if (payment.status === "confirmed") {
+    const user = db.query("SELECT credits FROM users WHERE wallet_address = ?").get(payment.wallet_address) as any;
+    return c.json({ status: "already_confirmed", credits: user?.credits || 0 });
+  }
+
+  // Manual confirm without blockchain check
+  db.run("UPDATE payments SET status = 'confirmed' WHERE reference = ?", [refStr]);
+
+  const creditsToAdd = payment.credits_requested || 1;
+  const dbUser = db.query("SELECT credits FROM users WHERE wallet_address = ?").get(payment.wallet_address) as any;
+
+  let currentCredits: number;
+  if (dbUser) {
+    db.run("UPDATE users SET credits = credits + ? WHERE wallet_address = ?", [creditsToAdd, payment.wallet_address]);
+    currentCredits = dbUser.credits + creditsToAdd;
+  } else {
+    db.run(
+      "INSERT INTO users (wallet_address, credits, created_at) VALUES (?, ?, ?)",
+      [payment.wallet_address, creditsToAdd, new Date().toISOString()]
+    );
+    currentCredits = creditsToAdd;
+  }
+
+  console.log(`[payment/admin/verify-manual] Manually confirmed: ref=${refStr}, wallet=${payment.wallet_address}, credits=${creditsToAdd}`);
+
+  return c.json({
+    status: "confirmed_manually",
+    creditsAdded: creditsToAdd,
+    currentCredits,
+  });
 });

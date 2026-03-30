@@ -63,7 +63,15 @@ db.exec(`
     reference TEXT PRIMARY KEY,
     wallet_address TEXT NOT NULL,
     amount_sol REAL NOT NULL,
+    credits_requested INTEGER NOT NULL DEFAULT 1,
     status TEXT NOT NULL, -- 'pending', 'confirmed', 'failed'
     created_at TEXT NOT NULL
   );
 `);
+
+// Migration: add credits_requested if not exists (safe for existing DBs)
+try {
+  db.exec("ALTER TABLE payments ADD COLUMN credits_requested INTEGER NOT NULL DEFAULT 1");
+} catch (_) {
+  // Column already exists
+}

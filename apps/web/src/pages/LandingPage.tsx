@@ -12,8 +12,10 @@ export function LandingPage() {
       
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#06060a]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative">
+          
+          {/* Left: Logo */}
+          <div className="flex items-center gap-2 z-10">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center shadow-[0_0_15px_rgba(52,211,153,0.3)]">
               <Activity className="w-5 h-5 text-black" strokeWidth={2.5} />
             </div>
@@ -21,14 +23,15 @@ export function LandingPage() {
               SimPasar
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+          
+          {/* Middle: Centered Nav */}
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
             <a href="#how-it-works" className="text-slate-400 hover:text-white transition">Cara Kerja</a>
             <a href="#pricing" className="text-slate-400 hover:text-white transition">Harga</a>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/app" className="text-sm font-medium px-4 py-2 text-white hover:text-emerald-400 transition-colors">
-              Log In
-            </Link>
+          
+          {/* Right: Actions */}
+          <div className="flex items-center gap-4 z-10">
             <Link 
               to="/app" 
               className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-emerald-400 hover:text-black hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all"
@@ -36,6 +39,7 @@ export function LandingPage() {
               Mulai Simulasi
             </Link>
           </div>
+          
         </div>
       </nav>
 
