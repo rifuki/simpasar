@@ -43,7 +43,7 @@ export function AppLayout() {
               }`
             }
           >
-            <LayoutDashboard className="w-5 h-5" /> Overview
+            <LayoutDashboard className="w-5 h-5" /> Tinjauan
           </NavLink>
           
           <NavLink
@@ -56,7 +56,7 @@ export function AppLayout() {
               }`
             }
           >
-            <Grid3X3 className="w-5 h-5" /> Market Cluster
+            <Grid3X3 className="w-5 h-5" /> Klaster Pasar
           </NavLink>
 
           <NavLink
@@ -109,7 +109,7 @@ export function AppLayout() {
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
           >
-            <LogOut className="w-4 h-4" /> Disconnect
+            <LogOut className="w-4 h-4" /> Keluar
           </button>
         </div>
       </aside>

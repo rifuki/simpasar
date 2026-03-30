@@ -1,7 +1,7 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUser } from "../../hooks/useUser";
 import { motion } from "framer-motion";
-import { Beaker, MapPin, Zap, ArrowRight, Wallet } from "lucide-react";
+import { Users, MapPin, Zap, ArrowRight, Wallet, History, Plus } from "lucide-react";
 import { useState } from "react";
 import { TopUpModal } from "../../components/payment/TopUpModal";
 import { Link } from "react-router-dom";
@@ -15,7 +15,7 @@ const FEATURES = [
     color: "blue",
   },
   {
-    icon: Beaker,
+    icon: Users,
     title: "AI Persona",
     desc: "50+ profil konsumen realistis per kota",
     color: "purple",
@@ -38,34 +38,22 @@ export function AppDashboard() {
   return (
     <div className="max-w-5xl mx-auto py-4">
       {/* Welcome Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-bold text-white tracking-tight mb-1"
-          >
-            Overview
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-slate-400 text-sm"
-          >
-            Manage your hyperlocal market intelligence simulations.
-          </motion.p>
-        </div>
-
-        <motion.button
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          onClick={() => setShowTopUp(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-slate-200 font-semibold text-sm transition-all"
+      <div className="mb-10">
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-2xl font-bold text-white tracking-tight mb-1"
         >
-          Top Up Saldo
-        </motion.button>
+          Tinjauan
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-slate-400 text-sm"
+        >
+          Kelola simulasi intelijen pasar hiperlokal Anda.
+        </motion.p>
       </div>
 
       {/* Main Cards Grid */}
@@ -87,22 +75,29 @@ export function AppDashboard() {
             </div>
 
             {isLoading ? (
-              <div className="h-16 w-32 bg-white/5 animate-pulse rounded-lg" />
+              <div className="h-16 w-32 bg-white/5 animate-pulse rounded-lg mt-4" />
             ) : (
-              <div className="text-6xl font-bold text-white tracking-tight">
-                {user?.credits || 0}
+              <div className="flex items-end gap-3 mt-4">
+                <div className="text-6xl font-bold text-white tracking-tight leading-none">
+                  {user?.credits || 0}
+                </div>
+                <div className="text-slate-500 text-sm mb-1 font-medium">
+                  credit tersisa
+                </div>
               </div>
             )}
 
-            <div className="text-slate-500 text-sm mt-2">
-              credit tersisa
-            </div>
+            <button
+              onClick={() => setShowTopUp(true)}
+              className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-black hover:bg-slate-200 font-semibold text-sm transition-all"
+            >
+              <Plus className="w-4 h-4" /> Top Up Saldo
+            </button>
 
-            <div className="mt-8 pt-5 border-t border-white/5">
-              <div className="text-xs text-slate-400 mb-1">
-                1 Simulasi = 1 Credit
+            <div className="mt-6 pt-5 border-t border-white/5">
+              <div className="text-xs text-slate-400 mb-1 leading-relaxed">
+                * Satu simulasi memotong satu credit per kota.
               </div>
-              <div className="text-xs text-slate-500">1 Kota = 1 Simulasi</div>
             </div>
           </div>
         </motion.div>
@@ -122,7 +117,7 @@ export function AppDashboard() {
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
-                <Beaker className="w-5 h-5 text-slate-300" />
+                <Zap className="w-5 h-5 text-slate-300" />
               </div>
               <div>
                 <div className="text-white font-medium group-hover:text-slate-200 transition-colors">
@@ -142,7 +137,7 @@ export function AppDashboard() {
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-slate-300" />
+                <History className="w-5 h-5 text-slate-300" />
               </div>
               <div>
                 <div className="text-white font-medium group-hover:text-slate-200 transition-colors">
