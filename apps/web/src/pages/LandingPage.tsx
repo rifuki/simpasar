@@ -3,14 +3,24 @@ import { useState } from "react";
 import { 
   ArrowRight, Activity, Users, CheckCircle, MapPin, BrainCircuit 
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import type { City } from "@shared/types";
+import { ParticlesBackground } from "../components/ui/ParticlesBackground";
 
 export function LandingPage() {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
+  
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
 
   const handleSimulateClick = () => {
     setIsNavigating(true);
@@ -29,7 +39,24 @@ export function LandingPage() {
 
   const displayCities = cities.slice(0, 4);
   return (
-    <div className="min-h-screen bg-[#06060a] text-slate-300 font-sans selection:bg-emerald-500/30">
+    <div 
+      className="min-h-screen bg-[#06060a] text-slate-300 font-sans selection:bg-emerald-500/30 relative overflow-hidden"
+      onMouseMove={handleMouseMove}
+    >
+      <motion.div
+        className="pointer-events-none fixed inset-0 z-0 transition duration-300 opacity-50"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              700px circle at ${mouseX}px ${mouseY}px,
+              rgba(16, 185, 129, 0.08),
+              transparent 80%
+            )
+          `,
+        }}
+      />
+      
+      <ParticlesBackground />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/10 via-transparent to-transparent pointer-events-none" />
       
       {/* Navbar */}
@@ -82,8 +109,17 @@ export function LandingPage() {
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
               Validasi Ide Bisnis di Klaster Hiperlokal <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-                Dalam 1 Menit.
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 inline-flex overflow-hidden" aria-label="Dalam 1 Menit.">
+                {"Dalam 1 Menit.".split("").map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.1, delay: 0.5 + index * 0.05 }}
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </motion.span>
+                ))}
               </span>
             </h1>
             <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
@@ -153,23 +189,38 @@ export function LandingPage() {
             <h2 className="text-3xl font-bold text-white mb-4">65.5 Juta UMKM, 0 Akses Data Pasar Lokal.</h2>
             <p className="text-slate-400">Pemilik bisnis membuang ratusan juta membuka cabang hanya bermodalkan "Gut Feel" (insting).</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            <ProblemCard 
-              icon={<Users className="w-8 h-8 text-emerald-400" />}
-              title="Hyper-Local Insights"
-              desc="Pahami perbedaan perilaku belanja spesifik pada masing-masing klaster tanpa mengandalkan asumsi umum."
-            />
-            <ProblemCard 
-              icon={<BrainCircuit className="w-8 h-8 text-cyan-400" />}
-              title="Backfire Warnings"
-              desc="AI kami mendeteksi potensi 'blunder' pemasaran sebelum kamu menghabiskan budget iklan."
-            />
-            <ProblemCard 
-              icon={<Activity className="w-8 h-8 text-blue-400" />}
-              title="Foot Traffic Analysis"
-              desc="Estimasi dampak traffic fisik dan digital terhadap konversi penjualan produk kamu."
-            />
-          </div>
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+            }}
+            className="grid md:grid-cols-3 gap-6"
+          >
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+              <ProblemCard 
+                icon={<Users className="w-8 h-8 text-emerald-400" />}
+                title="Hyper-Local Insights"
+                desc="Pahami perbedaan perilaku belanja spesifik pada masing-masing klaster tanpa mengandalkan asumsi umum."
+              />
+            </motion.div>
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+              <ProblemCard 
+                icon={<BrainCircuit className="w-8 h-8 text-cyan-400" />}
+                title="Backfire Warnings"
+                desc="AI kami mendeteksi potensi 'blunder' pemasaran sebelum kamu menghabiskan budget iklan."
+              />
+            </motion.div>
+            <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+              <ProblemCard 
+                icon={<Activity className="w-8 h-8 text-blue-400" />}
+                title="Foot Traffic Analysis"
+                desc="Estimasi dampak traffic fisik dan digital terhadap konversi penjualan produk kamu."
+              />
+            </motion.div>
+          </motion.div>
         </section>
 
         {/* How it Works Section */}
@@ -234,30 +285,45 @@ export function LandingPage() {
             </h2>
             <p className="text-slate-400">Riset tingkat enterprise, harga UMKM. Tersedia dalam Pay-As-You-Go maupun langganan.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <PricingCard 
-              title="Pay-As-You-Go"
-              price="75.000 IDR"
-              priceIdr="/ credit (1 Simulasi)"
-              features={["1 Credit Simulasi", "Tanpa Langganan", "Akses Seluruh Klaster Aktif", "Full Sentiment Analysis", "Credit Berlaku 12 Bulan"]}
-              buttonText="Beli Credit"
-            />
-            <PricingCard 
-              isPopular
-              title="Explorer"
-              price="150.000 IDR"
-              priceIdr="/ bulan (Berlangganan)"
-              features={["3 Simulasi per Bulan", "Prioritas Render < 48 Jam", "Akses Seluruh Klaster Aktif", "WTP & Backfire Alerts", "Export PDF Insights"]}
-              buttonText="Mulai Langganan"
-            />
-            <PricingCard 
-              title="Pro"
-              price="750.000 IDR"
-              priceIdr="/ bulan (Berlangganan)"
-              features={["Unlimited Simulasi", "Prioritas Tertinggi (< 8 Jam)", "Custom Persona Library", "PasarSim API Access", "Dedicated Support Manager"]}
-              buttonText="Mulai Pro"
-            />
-          </div>
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+            }}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
+          >
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }}>
+              <PricingCard 
+                title="Pay-As-You-Go"
+                price="75.000 IDR"
+                priceIdr="/ credit (1 Simulasi)"
+                features={["1 Credit Simulasi", "Tanpa Langganan", "Akses Seluruh Klaster Aktif", "Full Sentiment Analysis", "Credit Berlaku 12 Bulan"]}
+                buttonText="Beli Credit"
+              />
+            </motion.div>
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }}>
+              <PricingCard 
+                isPopular
+                title="Explorer"
+                price="150.000 IDR"
+                priceIdr="/ bulan (Berlangganan)"
+                features={["3 Simulasi per Bulan", "Prioritas Render < 48 Jam", "Akses Seluruh Klaster Aktif", "WTP & Backfire Alerts", "Export PDF Insights"]}
+                buttonText="Mulai Langganan"
+              />
+            </motion.div>
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }}>
+              <PricingCard 
+                title="Pro"
+                price="750.000 IDR"
+                priceIdr="/ bulan (Berlangganan)"
+                features={["Unlimited Simulasi", "Prioritas Tertinggi (< 8 Jam)", "Custom Persona Library", "PasarSim API Access", "Dedicated Support Manager"]}
+                buttonText="Mulai Pro"
+              />
+            </motion.div>
+          </motion.div>
         </section>
       </main>
 
