@@ -3,8 +3,20 @@ import {
   ArrowRight, Activity, Users, CheckCircle, MapPin, BrainCircuit 
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../lib/api";
+import type { City } from "@shared/types";
 
 export function LandingPage() {
+  const { data: cities = [], isLoading } = useQuery<City[]>({
+    queryKey: ["public-cities"],
+    queryFn: async () => {
+      const res = await api.get("/cities");
+      return res.success ? res.data : [];
+    }
+  });
+
+  const displayCities = cities.slice(0, 4);
   return (
     <div className="min-h-screen bg-[#06060a] text-slate-300 font-sans selection:bg-emerald-500/30">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/10 via-transparent to-transparent pointer-events-none" />
@@ -55,13 +67,13 @@ export function LandingPage() {
               <BrainCircuit className="w-4 h-4" /> Hyperlocal Market Intelligence
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-              Validasi Ide Bisnis di Klaster Suburban <br/>
+              Validasi Ide Bisnis di Klaster Hiperlokal <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
                 Dalam 1 Menit.
               </span>
             </h1>
             <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Memahami dinamika pasar Jabodetabek melalui simulasi AI agent berbasis data psikografi dan demografi nyata secara instan.
+              Memahami dinamika pasar hiperlokal melalui simulasi AI agent berbasis data psikografi dan demografi nyata secara instan.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link 
@@ -72,11 +84,22 @@ export function LandingPage() {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-            <div className="mt-10 flex items-center justify-center gap-8 opacity-60">
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Gading Serpong</span>
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> BSD City</span>
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Bekasi Timur</span>
-              <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Depok</span>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 opacity-60">
+              {isLoading ? (
+                <>
+                  <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
+                  <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
+                  <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
+                </>
+              ) : displayCities.length > 0 ? (
+                displayCities.map(city => (
+                  <span key={city.id} className="text-sm font-medium flex items-center gap-2">
+                    <MapPin className="w-4 h-4"/> {city.name}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Berbagai Klaster Terdaftar</span>
+              )}
             </div>
           </motion.div>
         </section>
@@ -115,7 +138,7 @@ export function LandingPage() {
                 <Step 
                   num="01" 
                   title="Target Klaster Spesifik" 
-                  desc="Pilih dari 4 klaster ekonomi kunci di Jabodetabek dengan karakteristik uni masing-masing."
+                  desc="Pilih dari berbagai klaster ekonomi kunci yang terdaftar dengan karakteristik unik masing-masing."
                 />
                 <Step 
                   num="02" 
@@ -173,7 +196,7 @@ export function LandingPage() {
               title="Pay-As-You-Go"
               price="75.000 IDR"
               priceIdr="/ credit (1 Simulasi)"
-              features={["1 Credit Simulasi", "Tanpa Langganan", "Akses 4 Klaster Jabodetabek", "Full Sentiment Analysis", "Credit Berlaku 12 Bulan"]}
+              features={["1 Credit Simulasi", "Tanpa Langganan", "Akses Seluruh Klaster Aktif", "Full Sentiment Analysis", "Credit Berlaku 12 Bulan"]}
               buttonText="Beli Credit"
             />
             <PricingCard 
@@ -181,7 +204,7 @@ export function LandingPage() {
               title="Explorer"
               price="150.000 IDR"
               priceIdr="/ bulan (Berlangganan)"
-              features={["3 Simulasi per Bulan", "Prioritas Render < 48 Jam", "Akses 4 Klaster Jabodetabek", "WTP & Backfire Alerts", "Export PDF Insights"]}
+              features={["3 Simulasi per Bulan", "Prioritas Render < 48 Jam", "Akses Seluruh Klaster Aktif", "WTP & Backfire Alerts", "Export PDF Insights"]}
               buttonText="Mulai Langganan"
             />
             <PricingCard 
