@@ -1,7 +1,7 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUser } from "../../hooks/useUser";
 import { motion } from "framer-motion";
-import { Coins, Beaker, MapPin, Zap, ArrowRight } from "lucide-react";
+import { PlusCircle, Beaker, MapPin, Zap, ArrowRight, Wallet } from "lucide-react";
 import { useState } from "react";
 import { TopUpModal } from "../../components/payment/TopUpModal";
 import { Link } from "react-router-dom";
@@ -64,7 +64,7 @@ export function AppDashboard() {
           onClick={() => setShowTopUp(true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-[#021A11] font-semibold text-sm transition-all shadow-lg hover:shadow-[0_0_15px_rgba(52,211,153,0.3)]"
         >
-          <Coins className="w-4 h-4" /> Top Up Saldo
+          <span className="text-lg">💎</span> Top Up Saldo
         </motion.button>
       </div>
 
@@ -77,7 +77,7 @@ export function AppDashboard() {
           className="lg:col-span-1 bg-gradient-to-br from-emerald-900/40 to-emerald-950/20 border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 p-6 opacity-20">
-            <Coins className="w-32 h-32 text-emerald-400" />
+            <Wallet className="w-32 h-32 text-emerald-400" />
           </div>
           
           <div className="relative z-10">
