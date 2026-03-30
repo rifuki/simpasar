@@ -1,25 +1,37 @@
+import axios from "axios";
 import type { SimulationRequest, SimulationResult, City } from "@shared/types";
 
 const BASE = "/api";
 
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(err.message || `HTTP ${res.status}`);
+const apiClient = axios.create({ baseURL: BASE });
+
+async function handleResponse<T>(promise: Promise<any>): Promise<T> {
+  try {
+    const res = await promise;
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || error.message || `API Error`);
+    }
+    throw error;
   }
-  return res.json();
 }
 
 export async function fetchCities(): Promise<City[]> {
-  const res = await fetch(`${BASE}/cities`);
-  return handleResponse<City[]>(res);
+  return handleResponse<City[]>(apiClient.get("/cities"));
 }
 
 export async function runSimulation(body: SimulationRequest): Promise<SimulationResult> {
-  const res = await fetch(`${BASE}/simulation/run`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  return handleResponse<SimulationResult>(res);
+  return handleResponse<SimulationResult>(apiClient.post("/simulation/run", body));
 }
+
+export const api = {
+  get: async (url: string) => {
+    const finalUrl = url.startsWith("http") ? url : url.replace(BASE, "");
+    return handleResponse<any>(apiClient.get(finalUrl));
+  },
+  post: async (url: string, data: any) => {
+    const finalUrl = url.startsWith("http") ? url : url.replace(BASE, "");
+    return handleResponse<any>(apiClient.post(finalUrl, data));
+  }
+};

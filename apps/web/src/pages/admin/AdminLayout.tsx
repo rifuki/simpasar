@@ -1,12 +1,13 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { PieChart, Users, Map, Clock, TerminalSquare, LogOut, ArrowLeft } from "lucide-react";
 import { clearAdminKey } from "../../lib/adminApi";
 
 const navItems = [
-  { to: "/admin/dashboard", label: "Overview", icon: "📈" },
-  { to: "/admin/personas", label: "Personas", icon: "👥" },
-  { to: "/admin/cities", label: "Kota", icon: "🏙️" },
-  { to: "/admin/simulations", label: "History Simulasi", icon: "📊" },
-  { to: "/admin/prompt", label: "System Prompt", icon: "🤖" },
+  { to: "/admin/dashboard", label: "Overview", icon: <PieChart size={20} /> },
+  { to: "/admin/personas", label: "Personas", icon: <Users size={20} /> },
+  { to: "/admin/cities", label: "Kota", icon: <Map size={20} /> },
+  { to: "/admin/simulations", label: "History Simulasi", icon: <Clock size={20} /> },
+  { to: "/admin/prompt", label: "System Prompt", icon: <TerminalSquare size={20} /> },
 ];
 
 export function AdminLayout() {
@@ -48,14 +49,14 @@ export function AdminLayout() {
             to="/"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 transition mb-1"
           >
-            <span className="text-base leading-none">←</span>
+            <span className="text-base leading-none"><ArrowLeft size={18} /></span>
             Ke App
           </NavLink>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition"
           >
-            <span className="text-base leading-none">🚪</span>
+            <span className="text-base leading-none"><LogOut size={18} /></span>
             Keluar
           </button>
         </div>

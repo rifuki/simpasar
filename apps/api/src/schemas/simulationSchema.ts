@@ -26,6 +26,7 @@ export const simulationRequestSchema = z.object({
   additionalContext: z.string().max(300).optional(),
   tier: z.enum(["free", "basic", "pro"]).default("free"),
   paymentTxSignature: z.string().optional(),
+  walletAddress: z.string().min(10, "Invalid wallet address").optional(),
 });
 
 export type SimulationRequestInput = z.infer<typeof simulationRequestSchema>;

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const BASE = "/api/admin";
 const KEY_STORAGE = "simpasar_admin_key";
 
@@ -13,20 +15,22 @@ export function clearAdminKey(): void {
   localStorage.removeItem(KEY_STORAGE);
 }
 
-async function req<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Key": getAdminKey(),
-      ...options.headers,
-    },
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(err.message || `HTTP ${res.status}`);
+const adminAxios = axios.create({ baseURL: BASE });
+adminAxios.interceptors.request.use((config) => {
+  config.headers["X-Admin-Key"] = getAdminKey();
+  return config;
+});
+
+async function req<T>(promise: Promise<any>): Promise<T> {
+  try {
+    const res = await promise;
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || error.message || `API Error`);
+    }
+    throw error;
   }
-  return res.json();
 }
 
 // ─── Cities ──────────────────────────────────────────────────────────────────
@@ -39,48 +43,43 @@ export type AdminCity = {
 
 export const adminApi = {
   cities: {
-    list: () => req<AdminCity[]>("/cities"),
-    get: (id: string) => req<AdminCity>(`/cities/${id}`),
-    create: (data: Omit<AdminCity, "personaCount">) => req<AdminCity>("/cities", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: string, data: Omit<AdminCity, "id" | "personaCount">) => req<AdminCity>(`/cities/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-    delete: (id: string) => req<{ success: boolean }>(`/cities/${id}`, { method: "DELETE" }),
+    list: () => req<AdminCity[]>(adminAxios.get("/cities")),
+    get: (id: string) => req<AdminCity>(adminAxios.get(`/cities/${id}`)),
+    create: (data: Omit<AdminCity, "personaCount">) => req<AdminCity>(adminAxios.post("/cities", data)),
+    update: (id: string, data: Omit<AdminCity, "id" | "personaCount">) => req<AdminCity>(adminAxios.put(`/cities/${id}`, data)),
+    delete: (id: string) => req<{ success: boolean }>(adminAxios.delete(`/cities/${id}`)),
   },
 
   // ─── Personas ──────────────────────────────────────────────────────────────
 
   personas: {
-    list: (cityId?: string) => req<AdminPersona[]>(`/personas${cityId ? `?cityId=${cityId}` : ""}`),
-    get: (id: string) => req<AdminPersona>(`/personas/${id}`),
-    create: (data: AdminPersona) => req<AdminPersona>("/personas", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: string, data: Omit<AdminPersona, "id">) => req<AdminPersona>(`/personas/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-    delete: (id: string) => req<{ success: boolean }>(`/personas/${id}`, { method: "DELETE" }),
+    list: (cityId?: string) => req<AdminPersona[]>(adminAxios.get(`/personas`, { params: { cityId } })),
+    get: (id: string) => req<AdminPersona>(adminAxios.get(`/personas/${id}`)),
+    create: (data: AdminPersona) => req<AdminPersona>(adminAxios.post("/personas", data)),
+    update: (id: string, data: Omit<AdminPersona, "id">) => req<AdminPersona>(adminAxios.put(`/personas/${id}`, data)),
+    delete: (id: string) => req<{ success: boolean }>(adminAxios.delete(`/personas/${id}`)),
   },
 
   // ─── Simulations ───────────────────────────────────────────────────────────
 
   simulations: {
-    list: (params?: { limit?: number; offset?: number; cityId?: string }) => {
-      const qs = new URLSearchParams();
-      if (params?.limit) qs.set("limit", String(params.limit));
-      if (params?.offset) qs.set("offset", String(params.offset));
-      if (params?.cityId) qs.set("cityId", params.cityId);
-      return req<{ total: number; limit: number; offset: number; data: SimulationRow[] }>(`/simulations?${qs}`);
-    },
-    get: (id: string) => req<SimulationDetail>(`/simulations/${id}`),
+    list: (params?: { limit?: number; offset?: number; cityId?: string }) => 
+      req<{ total: number; limit: number; offset: number; data: SimulationRow[] }>(adminAxios.get(`/simulations`, { params })),
+    get: (id: string) => req<SimulationDetail>(adminAxios.get(`/simulations/${id}`)),
   },
 
   // ─── Settings ──────────────────────────────────────────────────────────────
 
   settings: {
-    getPrompt: () => req<{ prompt: string; isCustom: boolean }>("/settings/prompt"),
-    savePrompt: (prompt: string) => req<{ success: boolean; prompt: string }>("/settings/prompt", { method: "PUT", body: JSON.stringify({ prompt }) }),
-    resetPrompt: () => req<{ success: boolean; prompt: string }>("/settings/prompt", { method: "DELETE" }),
+    getPrompt: () => req<{ prompt: string; isCustom: boolean }>(adminAxios.get("/settings/prompt")),
+    savePrompt: (prompt: string) => req<{ success: boolean; prompt: string }>(adminAxios.put("/settings/prompt", { prompt })),
+    resetPrompt: () => req<{ success: boolean; prompt: string }>(adminAxios.delete("/settings/prompt")),
   },
 
   // ─── Stats ─────────────────────────────────────────────────────────────────
 
   stats: {
-    get: () => req<{ totalPersonas: number; totalCities: number; totalSimulations: number; todaySimulations: number }>("/stats"),
+    get: () => req<{ totalPersonas: number; totalCities: number; totalSimulations: number; todaySimulations: number }>(adminAxios.get("/stats")),
   },
 };
 

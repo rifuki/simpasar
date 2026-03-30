@@ -23,6 +23,7 @@ export interface SimulationRequest {
   additionalContext?: string;
   tier: SimulationTier;
   paymentTxSignature?: string;
+  walletAddress?: string;
 }
 
 export type PricePerception =

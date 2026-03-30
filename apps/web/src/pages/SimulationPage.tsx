@@ -5,15 +5,21 @@ import { LoadingAnimation } from "../components/simulation/LoadingAnimation";
 import { SummaryCard } from "../components/results/SummaryCard";
 import { SegmentChart } from "../components/results/SegmentChart";
 import { PersonaTable } from "../components/results/PersonaTable";
+import { ArrowLeft } from "lucide-react";
 import { useRunSimulation } from "../hooks/useSimulation";
+import { useWallet } from "@solana/wallet-adapter-react";
 import type { SimulationRequest, SimulationResult } from "@shared/types";
 
 export function SimulationPage() {
   const [result, setResult] = useState<SimulationResult | null>(null);
   const { mutate, isPending, error } = useRunSimulation();
+  const { publicKey } = useWallet();
 
   const handleSubmit = (req: SimulationRequest) => {
     setResult(null);
+    if (publicKey) {
+      req.walletAddress = publicKey.toBase58();
+    }
     mutate(req, {
       onSuccess: (data) => setResult(data),
     });
@@ -96,9 +102,9 @@ export function SimulationPage() {
                 <h2 className="text-white font-semibold">Hasil Simulasi</h2>
                 <button
                   onClick={handleReset}
-                  className="text-sm text-slate-400 hover:text-emerald-400 transition border border-slate-700 hover:border-emerald-500/50 rounded-lg px-3 py-1.5"
+                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-emerald-400 transition border border-slate-700 hover:border-emerald-500/50 rounded-lg px-3 py-1.5"
                 >
-                  ← Simulasi Baru
+                  <ArrowLeft className="w-4 h-4" /> Simulasi Baru
                 </button>
               </div>
               <SummaryCard result={result} />

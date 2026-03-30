@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Lightbulb, AlertTriangle, TrendingUp } from "lucide-react";
 import { formatRupiah } from "../../lib/utils";
 import type { SimulationResult } from "@shared/types";
 
@@ -115,7 +116,9 @@ export function SummaryCard({ result }: Props) {
 
       {/* Recommendation */}
       <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
-        <p className="text-xs text-emerald-400 font-medium mb-1">💡 Rekomendasi</p>
+        <p className="flex items-center gap-2 text-xs text-emerald-400 font-medium mb-2">
+          <Lightbulb className="w-4 h-4" /> Rekomendasi
+        </p>
         <p className="text-slate-300 text-sm leading-relaxed">
           {summary.overallRecommendation}
         </p>
@@ -124,7 +127,9 @@ export function SummaryCard({ result }: Props) {
       {/* Risks & Opportunities */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <p className="text-xs font-medium text-red-400 mb-2">⚠️ Risiko Utama</p>
+          <p className="flex items-center gap-2 text-xs font-medium text-red-400 mb-3">
+            <AlertTriangle className="w-4 h-4" /> Risiko Utama
+          </p>
           <ul className="space-y-1.5">
             {summary.keyRisks.map((r, i) => (
               <li key={i} className="text-xs text-slate-400 flex gap-2">
@@ -135,7 +140,9 @@ export function SummaryCard({ result }: Props) {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-medium text-emerald-400 mb-2">🚀 Peluang</p>
+          <p className="flex items-center gap-2 text-xs font-medium text-emerald-400 mb-3">
+            <TrendingUp className="w-4 h-4" /> Peluang
+          </p>
           <ul className="space-y-1.5">
             {summary.keyOpportunities.map((o, i) => (
               <li key={i} className="text-xs text-slate-400 flex gap-2">
