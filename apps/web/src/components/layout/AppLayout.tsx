@@ -17,7 +17,7 @@ export function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex text-white font-sans">
+    <div className="h-screen w-full overflow-hidden bg-[#050505] flex text-white font-sans">
       {/* Sidebar */}
       <aside className="w-64 shrink-0 border-r border-white/5 bg-[#0a0a0f] flex flex-col relative z-20">
         <div className="px-6 py-6 border-b border-white/5">
