@@ -1,0 +1,21 @@
+{
+  "name": "@simpasar/api",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "login:codex": "bun run src/scripts/login-codex.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@hono/zod-validator": "^0.7.6",
+    "@solana/pay": "^0.2.5",
+    "@solana/web3.js": "^1.98.0",
+    "bignumber.js": "^9.1.2",
+    "hono": "^4.7.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
