@@ -113,12 +113,7 @@ export function LandingPage() {
                 >
                   {isNavigating ? (
                     <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                      >
-                        <BrainCircuit className="w-6 h-6" />
-                      </motion.div>
+                      <div className="w-5 h-5 rounded-full border-[3px] border-black/20 border-t-black animate-[spin_0.8s_linear_infinite]" />
                       <span className="tracking-widest uppercase text-sm mt-0.5 whitespace-nowrap">
                         Initializing Agent...
                       </span>
