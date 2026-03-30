@@ -161,7 +161,7 @@ export function LandingPage() {
                   </div>
                   <div>
                     <div className="text-white font-bold text-lg tracking-tight">PasarSim</div>
-                    <div className="text-emerald-400 text-sm">Coffee Shop Premium (Contoh Simulasi)</div>
+                    <div className="text-emerald-400 text-sm">Coffee Shop Premium</div>
                   </div>
                 </div>
                 <div className="space-y-4">
