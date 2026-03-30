@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { 
   ArrowRight, Activity, Users, CheckCircle, MapPin, BrainCircuit 
 } from "lucide-react";
@@ -8,6 +9,16 @@ import { api } from "../lib/api";
 import type { City } from "@shared/types";
 
 export function LandingPage() {
+  const navigate = useNavigate();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const handleSimulateClick = () => {
+    setIsNavigating(true);
+    setTimeout(() => {
+      navigate("/app");
+    }, 800); // Dramatic delay for the demo visualization
+  };
+
   const { data: cities = [], isLoading } = useQuery<City[]>({
     queryKey: ["public-cities"],
     queryFn: async () => {
@@ -78,18 +89,48 @@ export function LandingPage() {
             <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
               Memahami dinamika pasar hiperlokal melalui simulasi AI agent berbasis data psikografi dan demografi nyata secara instan.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/app" className="w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative">
+              <div className="relative group w-full sm:w-auto">
+                {/* Glowing Aura that expands on hover & explodes on click */}
+                <div className={`absolute -inset-1 rounded-full blur-md opacity-40 transition-all duration-700 ${
+                  isNavigating 
+                    ? 'bg-emerald-400 animate-ping opacity-100 scale-150' 
+                    : 'bg-gradient-to-r from-emerald-500 to-cyan-500 group-hover:opacity-100 group-hover:blur-xl'
+                }`} />
+                
                 <motion.button 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95, y: 2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  className="group flex items-center justify-center gap-2 w-full px-8 py-4 bg-white text-black text-lg font-bold rounded-full hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(52,211,153,0.6)] transition-colors"
+                  disabled={isNavigating}
+                  onClick={handleSimulateClick}
+                  whileHover={!isNavigating ? { scale: 1.05 } : {}}
+                  whileTap={!isNavigating ? { scale: 0.9, y: 4, transition: { duration: 0.15 } } : {}}
+                  animate={isNavigating ? { scale: [0.9, 1.05, 1.1], opacity: [1, 1, 0] } : {}}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className={`relative z-10 flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 font-extrabold rounded-full transition-all duration-300 ${
+                    isNavigating 
+                      ? "bg-emerald-400 text-black shadow-[0_0_50px_rgba(52,211,153,1)]" 
+                      : "bg-white text-black hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(52,211,153,0.6)]"
+                  }`}
                 >
-                  Mulai Simulasi Sekarang
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  {isNavigating ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                      >
+                        <BrainCircuit className="w-6 h-6" />
+                      </motion.div>
+                      <span className="tracking-widest uppercase text-sm mt-0.5 whitespace-nowrap">
+                        Initializing Agent...
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-lg whitespace-nowrap">Mulai Simulasi Sekarang</span>
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                    </>
+                  )}
                 </motion.button>
-              </Link>
+              </div>
             </div>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6 opacity-60">
               {isLoading ? (
