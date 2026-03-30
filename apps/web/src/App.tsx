@@ -17,6 +17,7 @@ import { PromptPage } from "./pages/admin/PromptPage";
 // B2B App Pages
 import { AppLogin } from "./pages/app/AppLogin";
 import { AppDashboard } from "./pages/app/AppDashboard";
+import { HistoryPage } from "./pages/app/HistoryPage";
 import { SimulationPage } from "./pages/SimulationPage";
 
 // Services & Guards
@@ -52,6 +53,7 @@ export default function App() {
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard" element={<AppDashboard />} />
               <Route path="simulate" element={<SimulationPage />} />
+              <Route path="history" element={<HistoryPage />} />
             </Route>
             
             {/* Admin Dashboard */}

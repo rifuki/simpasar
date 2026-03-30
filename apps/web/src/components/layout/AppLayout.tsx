@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { LayoutDashboard, Beaker, LogOut, ArrowLeft, Coins } from "lucide-react";
+import { LayoutDashboard, Beaker, History, LogOut, ArrowLeft, Coins } from "lucide-react";
 import { useUser } from "../../hooks/useUser";
 import { useState } from "react";
 import { TopUpModal } from "../payment/TopUpModal";
@@ -50,6 +50,19 @@ export function AppLayout() {
             }
           >
             <Beaker className="w-5 h-5" /> Market Simulation
+          </NavLink>
+
+          <NavLink
+            to="/app/history"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(52,211,153,0.05)]"
+                  : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent"
+              }`
+            }
+          >
+            <History className="w-5 h-5" /> Riwayat
           </NavLink>
         </nav>
 

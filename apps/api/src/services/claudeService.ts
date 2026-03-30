@@ -133,6 +133,7 @@ export async function runSimulation(request: SimulationRequest): Promise<Simulat
     marketPenetration,
     requestJson: JSON.stringify(request),
     resultJson: JSON.stringify(result),
+    walletAddress: request.walletAddress,
   });
 
   return result;

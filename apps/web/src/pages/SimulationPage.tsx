@@ -4,7 +4,7 @@ import { SimulationForm } from "../components/simulation/SimulationForm";
 import { LoadingAnimation } from "../components/simulation/LoadingAnimation";
 import { SummaryCard } from "../components/results/SummaryCard";
 import { SegmentChart } from "../components/results/SegmentChart";
-import { PersonaTable } from "../components/results/PersonaTable";
+import { PersonaGrid } from "../components/results/PersonaGrid";
 import { ArrowLeft } from "lucide-react";
 import { useRunSimulation } from "../hooks/useSimulation";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -14,43 +14,65 @@ import { useToast } from "../components/ui/Toast";
 import type { SimulationRequest, SimulationResult } from "@shared/types";
 
 export function SimulationPage() {
-  const [result, setResult] = useState<SimulationResult | null>(null);
+  const [results, setResults] = useState<SimulationResult[] | null>(null);
   const [showTopUp, setShowTopUp] = useState(false);
-  const { mutate, isPending, error } = useRunSimulation();
+  const [activeTab, setActiveTab] = useState(0);
+  const [simulatingCount, setSimulatingCount] = useState<{current: number, total: number} | null>(null);
+  
+  const { mutateAsync, isPending, error } = useRunSimulation();
   const { publicKey } = useWallet();
   const walletStr = publicKey?.toBase58();
   const { data: user, refetch: refetchUser } = useUser(walletStr || null);
   const { showToast } = useToast();
 
-  const handleSubmit = (req: SimulationRequest) => {
-    if (user && user.credits < 1) {
-      showToast("Saldo credit tidak cukup. Silakan top up terlebih dahulu.", "error");
+  const handleSubmit = async (reqs: SimulationRequest[]) => {
+    if (!walletStr) {
+      showToast("Silakan connect wallet terlebih dahulu.", "error");
+      return;
+    }
+
+    if (user && user.credits < reqs.length) {
+      showToast(`Saldo credit tidak cukup. Butuh ${reqs.length} credit, saldo Anda ${user.credits}.`, "error");
       setShowTopUp(true);
       return;
     }
 
-    setResult(null);
-    if (publicKey) {
-      req.walletAddress = publicKey.toBase58();
+    setResults(null);
+    setSimulatingCount({ current: 1, total: reqs.length });
+    
+    const accumulatedResults: SimulationResult[] = [];
+    
+    try {
+      for (let i = 0; i < reqs.length; i++) {
+        setSimulatingCount({ current: i + 1, total: reqs.length });
+        const req = { ...reqs[i], walletAddress: walletStr };
+        const data = await mutateAsync(req);
+        accumulatedResults.push(data);
+      }
+      setResults(accumulatedResults);
+      setActiveTab(0);
+      refetchUser(); // Refresh credits
+      showToast(`Simulasi berhasil! ${reqs.length} credit telah digunakan.`, "success");
+    } catch (err: any) {
+      if (err.message?.includes("INSUFFICIENT_CREDITS")) {
+        showToast("Saldo credit tidak cukup. Silakan top up terlebih dahulu.", "error");
+        setShowTopUp(true);
+      } else {
+        showToast(err.message || "Gagal menjalankan simulasi", "error");
+      }
+    } finally {
+      setSimulatingCount(null);
     }
-    mutate(req, {
-      onSuccess: (data) => {
-        setResult(data);
-        refetchUser(); // Refresh credits after deduction
-        showToast("Simulasi berhasil! 1 credit telah digunakan.", "success");
-      },
-      onError: (err) => {
-        if (err.message?.includes("INSUFFICIENT_CREDITS")) {
-          showToast("Saldo credit tidak cukup. Silakan top up terlebih dahulu.", "error");
-          setShowTopUp(true);
-        } else {
-          showToast(err.message || "Gagal menjalankan simulasi", "error");
-        }
-      },
-    });
   };
 
-  const handleReset = () => setResult(null);
+  const handleReset = () => {
+    setResults(null);
+    setSimulatingCount(null);
+  };
+
+  // Safe checks if results array handles properly
+  const isCurrentlySimulating = isPending || simulatingCount !== null;
+  const currentResult = results ? results[activeTab] : null;
 
   return (
     <div className="max-w-4xl mx-auto py-4 relative">
@@ -85,13 +107,12 @@ export function SimulationPage() {
 
         <AnimatePresence mode="wait">
           {/* Form */}
-          {!isPending && !result && (
+          {!isCurrentlySimulating && !results && (
             <motion.div
               key="form"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6 md:p-8"
             >
               {error && (
                 <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
@@ -103,28 +124,37 @@ export function SimulationPage() {
           )}
 
           {/* Loading */}
-          {isPending && (
+          {isCurrentlySimulating && simulatingCount && (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="bg-slate-800/30 border border-slate-700/50 rounded-2xl"
+              className="bg-slate-800/30 border border-slate-700/50 rounded-2xl flex flex-col pt-4 overflow-hidden"
             >
+              <div className="px-6 pb-2 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/40">
+                <h3 className="text-emerald-400 font-semibold tracking-wide text-sm flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                  SIMULATING MARKETS
+                </h3>
+                <span className="bg-slate-900 px-3 py-1 rounded text-xs font-medium text-slate-300">
+                  {simulatingCount.current} / {simulatingCount.total} Kota
+                </span>
+              </div>
               <LoadingAnimation />
             </motion.div>
           )}
 
           {/* Results */}
-          {result && !isPending && (
+          {results && currentResult && !isCurrentlySimulating && (
             <motion.div
               key="results"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="flex justify-between items-center">
-                <h2 className="text-white font-semibold">Hasil Simulasi</h2>
+              <div className="flex justify-between items-center sticky top-0 bg-[#0B1121] py-4 z-10 border-b border-slate-800">
+                <h2 className="text-white font-semibold text-xl">Hasil Simulasi</h2>
                 <button
                   onClick={handleReset}
                   className="flex items-center gap-2 text-sm text-slate-400 hover:text-emerald-400 transition border border-slate-700 hover:border-emerald-500/50 rounded-lg px-3 py-1.5"
@@ -132,9 +162,39 @@ export function SimulationPage() {
                   <ArrowLeft className="w-4 h-4" /> Simulasi Baru
                 </button>
               </div>
-              <SummaryCard result={result} />
-              <SegmentChart segments={result.segmentBreakdown} />
-              <PersonaTable personas={result.personaDetails} />
+
+              {results.length > 1 && (
+                <div className="flex overflow-x-auto gap-2 pb-2">
+                  {results.map((res, idx) => (
+                    <button
+                      key={res.id}
+                      onClick={() => setActiveTab(idx)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap border ${
+                        activeTab === idx 
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)]' 
+                          : 'bg-slate-800/50 text-slate-400 border-slate-700/50 hover:bg-slate-800 hover:text-slate-300'
+                      }`}
+                    >
+                      {res.cityContext.cityName}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentResult.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-6"
+                >
+                  <SummaryCard result={currentResult} />
+                  <SegmentChart segments={currentResult.segmentBreakdown} />
+                  <PersonaGrid personas={currentResult.personaDetails} />
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>

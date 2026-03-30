@@ -45,7 +45,8 @@ db.exec(`
     product_name TEXT NOT NULL,
     market_penetration INTEGER NOT NULL,
     request_json TEXT NOT NULL,
-    result_json TEXT NOT NULL
+    result_json TEXT NOT NULL,
+    wallet_address TEXT
   );
 
   CREATE TABLE IF NOT EXISTS settings (
@@ -72,6 +73,13 @@ db.exec(`
 // Migration: add credits_requested if not exists (safe for existing DBs)
 try {
   db.exec("ALTER TABLE payments ADD COLUMN credits_requested INTEGER NOT NULL DEFAULT 1");
+} catch (_) {
+  // Column already exists
+}
+
+// Migration: add wallet_address to simulations if not exists
+try {
+  db.exec("ALTER TABLE simulations ADD COLUMN wallet_address TEXT");
 } catch (_) {
   // Column already exists
 }

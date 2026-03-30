@@ -82,10 +82,11 @@ export function saveSimulation(sim: {
   marketPenetration: number;
   requestJson: string;
   resultJson: string;
+  walletAddress?: string;
 }): void {
   db.prepare(`
-    INSERT INTO simulations (id, created_at, city_id, product_name, market_penetration, request_json, result_json)
-    VALUES ($id, $createdAt, $cityId, $productName, $marketPenetration, $requestJson, $resultJson)
+    INSERT INTO simulations (id, created_at, city_id, product_name, market_penetration, request_json, result_json, wallet_address)
+    VALUES ($id, $createdAt, $cityId, $productName, $marketPenetration, $requestJson, $resultJson, $walletAddress)
   `).run({
     $id: sim.id,
     $createdAt: sim.createdAt,
@@ -94,15 +95,24 @@ export function saveSimulation(sim: {
     $marketPenetration: sim.marketPenetration,
     $requestJson: sim.requestJson,
     $resultJson: sim.resultJson,
+    $walletAddress: sim.walletAddress || null,
   });
 }
 
 export function getSimulations(limit = 50, offset = 0): {
-  id: string; created_at: string; city_id: string; product_name: string; market_penetration: number;
+  id: string; created_at: string; city_id: string; product_name: string; market_penetration: number; wallet_address: string | null;
 }[] {
   return db.query(
-    "SELECT id, created_at, city_id, product_name, market_penetration FROM simulations ORDER BY created_at DESC LIMIT $limit OFFSET $offset"
+    "SELECT id, created_at, city_id, product_name, market_penetration, wallet_address FROM simulations ORDER BY created_at DESC LIMIT $limit OFFSET $offset"
   ).all({ $limit: limit, $offset: offset }) as ReturnType<typeof getSimulations>;
+}
+
+export function getSimulationsByWallet(walletAddress: string, limit = 50, offset = 0): {
+  id: string; created_at: string; city_id: string; product_name: string; market_penetration: number; wallet_address: string;
+}[] {
+  return db.query(
+    "SELECT id, created_at, city_id, product_name, market_penetration, wallet_address FROM simulations WHERE wallet_address = $walletAddress ORDER BY created_at DESC LIMIT $limit OFFSET $offset"
+  ).all({ $walletAddress: walletAddress, $limit: limit, $offset: offset }) as ReturnType<typeof getSimulationsByWallet>;
 }
 
 export function getSimulationById(id: string): { id: string; created_at: string; city_id: string; product_name: string; market_penetration: number; request_json: string; result_json: string } | undefined {
