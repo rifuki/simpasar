@@ -3,7 +3,7 @@ import { db } from "../db/database";
 
 export const chatRoute = new Hono();
 
-const CHAT_SESSION_HOURS = 24;
+const CHAT_SESSION_HOURS = 12;
 
 interface ChatRequestBody {
   message: string;

@@ -18,8 +18,8 @@ const MERCHANT_WALLET = new PublicKey(
 const IDRX_SPL_TOKEN = new PublicKey(
   process.env.IDRX_TOKEN_MINT || "HnBXnUjXgqM4R8sQwzC1qT4qQyQ7yvL6xK7uJ3y7vQ6a"
 );
-// Harga 1 credit = 75000 IDRX
-const PRICE_IDRX = new BigNumber(75000);
+// Harga 1 credit = 300000 IDRX
+const PRICE_IDRX = new BigNumber(300000);
 
 paymentRoute.get("/checkout", async (c) => {
   const buyerWalletStr = c.req.query("wallet");

@@ -28,7 +28,7 @@ function formatTimeLeft(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-const SESSION_HOURS = 24;
+const SESSION_HOURS = 12;
 
 const SUGGESTED_QUESTIONS = [
   "Apa strategi terbaik untuk meningkatkan market penetration?",

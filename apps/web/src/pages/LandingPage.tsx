@@ -108,9 +108,9 @@ export function LandingPage() {
               <BrainCircuit className="w-4 h-4" /> Hyperlocal Market Intelligence
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-              Validasi Ide Bisnis di Klaster Hiperlokal <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 inline-flex overflow-hidden" aria-label="Dalam 1 Menit.">
-                {"Dalam 1 Menit.".split("").map((char, index) => (
+              Validasi Ide Bisnis di Pasar Hiperlokal <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 inline-flex overflow-hidden" aria-label="Sebelum Kamu Buka.">
+                {"Sebelum Kamu Buka.".split("").map((char, index) => (
                   <motion.span
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
@@ -177,7 +177,7 @@ export function LandingPage() {
                   </span>
                 ))
               ) : (
-                <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Berbagai Klaster Terdaftar</span>
+                <span className="text-sm font-medium flex items-center gap-2"><MapPin className="w-4 h-4"/> Berbagai Pasar Terdaftar</span>
               )}
             </div>
           </motion.div>
@@ -200,10 +200,10 @@ export function LandingPage() {
             className="grid md:grid-cols-3 gap-6"
           >
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-              <ProblemCard 
+              <ProblemCard
                 icon={<Users className="w-8 h-8 text-emerald-400" />}
                 title="Hyper-Local Insights"
-                desc="Pahami perbedaan perilaku belanja spesifik pada masing-masing klaster tanpa mengandalkan asumsi umum."
+                desc="Pahami perbedaan perilaku belanja spesifik pada masing-masing area pasar tanpa mengandalkan asumsi umum."
               />
             </motion.div>
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
@@ -229,15 +229,15 @@ export function LandingPage() {
             <div className="flex-1">
               <h2 className="text-3xl font-bold text-white mb-8">Intelligence Level Baru</h2>
               <div className="space-y-8">
-                <Step 
-                  num="01" 
-                  title="Target Klaster Spesifik" 
-                  desc="Pilih dari berbagai klaster ekonomi kunci yang terdaftar dengan karakteristik unik masing-masing."
+                <Step
+                  num="01"
+                  title="Target Pasar Spesifik"
+                  desc="Pilih dari berbagai segmen pasar hiperlokal yang terdaftar dengan karakteristik unik masing-masing."
                 />
-                <Step 
-                  num="02" 
-                  title="Deep Persona Simulation" 
-                  desc="Puluhan AI Agent dengan profil demografi nyata dari tiap klaster menguji kelayakan ide dan hargamu."
+                <Step
+                  num="02"
+                  title="Deep Persona Simulation"
+                  desc="Puluhan AI Agent dengan profil demografi nyata dari tiap area pasar menguji kelayakan ide dan hargamu."
                 />
                 <Step 
                   num="03" 
@@ -283,9 +283,9 @@ export function LandingPage() {
             <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 tracking-tight">
               Simulate Before You Open.
             </h2>
-            <p className="text-slate-400">Riset tingkat enterprise, harga UMKM. Tersedia dalam Pay-As-You-Go maupun langganan.</p>
+            <p className="text-slate-400">Bayar hanya saat kamu butuh. Tanpa langganan, tanpa komitmen.</p>
           </div>
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
@@ -293,34 +293,15 @@ export function LandingPage() {
               hidden: { opacity: 0 },
               visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
             }}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
+            className="flex justify-center"
           >
-            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }}>
-              <PricingCard 
+            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }} className="w-full max-w-sm">
+              <PricingCard
                 title="Pay-As-You-Go"
-                price="75.000 IDR"
+                price="300.000 IDR"
                 priceIdr="/ credit (1 Simulasi)"
-                features={["1 Credit Simulasi", "Tanpa Langganan", "Akses Seluruh Klaster Aktif", "Full Sentiment Analysis", "Credit Berlaku 12 Bulan"]}
+                features={["1 Credit = 1 Simulasi Penuh", "Tanpa Langganan", "Akses Seluruh Pasar Aktif", "Full Sentiment & WTP Analysis", "Credit Berlaku 12 Bulan"]}
                 buttonText="Beli Credit"
-              />
-            </motion.div>
-            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }}>
-              <PricingCard 
-                isPopular
-                title="Explorer"
-                price="150.000 IDR"
-                priceIdr="/ bulan (Berlangganan)"
-                features={["3 Simulasi per Bulan", "Prioritas Render < 48 Jam", "Akses Seluruh Klaster Aktif", "WTP & Backfire Alerts", "Export PDF Insights"]}
-                buttonText="Mulai Langganan"
-              />
-            </motion.div>
-            <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring" } } }}>
-              <PricingCard 
-                title="Pro"
-                price="750.000 IDR"
-                priceIdr="/ bulan (Berlangganan)"
-                features={["Unlimited Simulasi", "Prioritas Tertinggi (< 8 Jam)", "Custom Persona Library", "PasarSim API Access", "Dedicated Support Manager"]}
-                buttonText="Mulai Pro"
               />
             </motion.div>
           </motion.div>

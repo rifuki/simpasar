@@ -36,7 +36,6 @@ export function LoadingAnimation({ currentStep, thought = "" }: LoadingAnimation
         {SIMULATION_STEPS.map((step, i) => {
           const isDone = i < stepIndex;
           const isCurrent = i === stepIndex;
-          const isPending = i > stepIndex;
 
           return (
             <div key={step.key} className="flex items-center flex-1 min-w-0">

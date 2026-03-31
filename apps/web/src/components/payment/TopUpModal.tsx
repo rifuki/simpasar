@@ -31,7 +31,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const successFiredRef = useRef(false);
 
-  const PRICE_PER_CREDIT = 75000;
+  const PRICE_PER_CREDIT = 300000;
 
   // 1. Fetch checkout details (re-runs when creditsCount changes)
   const { data: checkout, isLoading: isCheckoutLoading, isError: isCheckoutError } = useQuery({
