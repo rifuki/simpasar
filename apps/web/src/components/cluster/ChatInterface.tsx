@@ -85,9 +85,10 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
             content: m.content,
             timestamp: m.created_at,
           }));
+          console.log("[ChatInterface] DB messages mapped:", dbMessages.map(m => ({ role: m.role, content: m.content.substring(0, 30) })));
           // Always prepend welcome as first visual message
           const fullMessages = [buildWelcomeMessage(simulationResult), ...dbMessages];
-          console.log("[ChatInterface] Setting messages:", fullMessages.length);
+          console.log("[ChatInterface] Setting messages:", fullMessages.length, fullMessages.map(m => ({ id: m.id, role: m.role })));
           setMessages(fullMessages);
         }
         if (data.isExpired) setIsExpired(true);
