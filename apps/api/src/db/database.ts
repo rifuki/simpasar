@@ -20,6 +20,26 @@ db.exec(`
     top_industries TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS clusters (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    city_id TEXT NOT NULL REFERENCES cities(id) ON DELETE CASCADE,
+    city TEXT NOT NULL,
+    province TEXT NOT NULL,
+    industry TEXT NOT NULL,
+    industry_label TEXT NOT NULL,
+    description TEXT NOT NULL,
+    market_size TEXT NOT NULL,
+    competition_level TEXT NOT NULL,
+    avg_spending INTEGER NOT NULL,
+    demographics TEXT NOT NULL,
+    key_insights TEXT NOT NULL,
+    icon TEXT NOT NULL DEFAULT 'Utensils',
+    color TEXT NOT NULL DEFAULT 'orange',
+    active_personas INTEGER NOT NULL DEFAULT 50,
+    category TEXT NOT NULL DEFAULT 'fnb_beverage'
+  );
+
   CREATE TABLE IF NOT EXISTS personas (
     id TEXT PRIMARY KEY,
     city_id TEXT NOT NULL REFERENCES cities(id) ON DELETE CASCADE,

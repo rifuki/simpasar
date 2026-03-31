@@ -1,17 +1,23 @@
 import { db } from "./database";
 import { cities } from "../data/cities";
 import { personas } from "../data/personas";
+import { clustersSeed } from "../data/clusters";
 import { SYSTEM_PROMPT } from "../services/promptBuilder";
 
 export function seedIfEmpty() {
   const cityCount = (db.query("SELECT COUNT(*) as count FROM cities").get() as { count: number }).count;
   if (cityCount > 0) return;
 
-  console.log("[seed] Seeding cities and personas from static data...");
+  console.log("[seed] Seeding cities, clusters, and personas from seed data...");
 
   const insertCity = db.prepare(`
     INSERT OR IGNORE INTO cities (id, name, province, tier, population, economic_profile, avg_monthly_expenditure, top_industries)
     VALUES ($id, $name, $province, $tier, $population, $economicProfile, $avgMonthlyExpenditure, $topIndustries)
+  `);
+
+  const insertCluster = db.prepare(`
+    INSERT OR IGNORE INTO clusters (id, name, city_id, city, province, industry, industry_label, description, market_size, competition_level, avg_spending, demographics, key_insights, icon, color, active_personas, category)
+    VALUES ($id, $name, $cityId, $city, $province, $industry, $industryLabel, $description, $marketSize, $competitionLevel, $avgSpending, $demographics, $keyInsights, $icon, $color, $activePersonas, $category)
   `);
 
   const insertPersona = db.prepare(`
@@ -30,6 +36,28 @@ export function seedIfEmpty() {
         $economicProfile: city.economicProfile,
         $avgMonthlyExpenditure: city.avgMonthlyExpenditure,
         $topIndustries: JSON.stringify(city.topIndustries),
+      });
+    }
+
+    for (const cluster of clustersSeed) {
+      insertCluster.run({
+        $id: cluster.id,
+        $name: cluster.name,
+        $cityId: cluster.cityId,
+        $city: cluster.city,
+        $province: cluster.province,
+        $industry: cluster.industry,
+        $industryLabel: cluster.industryLabel,
+        $description: cluster.description,
+        $marketSize: cluster.marketSize,
+        $competitionLevel: cluster.competitionLevel,
+        $avgSpending: cluster.avgSpending,
+        $demographics: cluster.demographics,
+        $keyInsights: JSON.stringify(cluster.keyInsights),
+        $icon: cluster.icon,
+        $color: cluster.color,
+        $activePersonas: cluster.activePersonas,
+        $category: cluster.category,
       });
     }
 
@@ -59,7 +87,7 @@ export function seedIfEmpty() {
   });
 
   seedAll();
-  console.log(`[seed] Done — ${cities.length} cities, ${personas.length} personas`);
+  console.log(`[seed] Done — ${cities.length} cities, ${clustersSeed.length} clusters, ${personas.length} personas`);
 }
 
 // Auto-run if executed directly

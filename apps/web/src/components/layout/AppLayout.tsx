@@ -17,10 +17,10 @@ export function AppLayout() {
   };
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-[#050505] flex text-white font-sans">
+    <div className="h-screen w-full overflow-hidden bg-[#0c0c0a] flex text-white font-sans">
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 border-r border-white/5 bg-[#0a0a0f] flex flex-col relative z-20">
-        <div className="px-6 py-8 border-b border-white/5">
+      <aside className="w-64 shrink-0 border-r border-white/[0.06] bg-[#0e0e0b] flex flex-col relative z-20">
+        <div className="px-6 py-8 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 flex items-center justify-center p-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] shadow-[0_0_15px_rgba(255,255,255,0.03)]">
               <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain opacity-90" />
@@ -35,8 +35,8 @@ export function AppLayout() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-white/[0.05] text-white border border-white/10"
-                  : "text-slate-500 hover:text-white hover:bg-white/[0.02] border border-transparent"
+                  ? "bg-emerald-500/[0.08] text-emerald-400 border border-emerald-500/20"
+                  : "text-slate-500 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
               }`
             }
           >
@@ -48,8 +48,8 @@ export function AppLayout() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-white/[0.05] text-white border border-white/10"
-                  : "text-slate-500 hover:text-white hover:bg-white/[0.02] border border-transparent"
+                  ? "bg-emerald-500/[0.08] text-emerald-400 border border-emerald-500/20"
+                  : "text-slate-500 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
               }`
             }
           >
@@ -61,8 +61,8 @@ export function AppLayout() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-white/[0.05] text-white border border-white/10"
-                  : "text-slate-500 hover:text-white hover:bg-white/[0.02] border border-transparent"
+                  ? "bg-emerald-500/[0.08] text-emerald-400 border border-emerald-500/20"
+                  : "text-slate-500 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
               }`
             }
           >
@@ -70,22 +70,20 @@ export function AppLayout() {
           </NavLink>
         </nav>
 
-        <div className="px-4 py-6 border-t border-white/5">
+        <div className="px-4 py-6 border-t border-white/[0.06]">
           {/* Credit Balance Card */}
-          <div className="mb-4 bg-white/[0.02] border border-white/5 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-slate-400">
-                <Coins className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Saldo Credit</span>
-              </div>
+          <div className="mb-4 bg-amber-500/[0.04] border border-amber-500/[0.12] rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Coins className="w-3.5 h-3.5 text-amber-400/70" />
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-400/60">Saldo Credit</span>
             </div>
             <div className="flex items-baseline gap-1 mb-3">
-              <span className="text-2xl font-bold text-white">{user?.credits ?? 0}</span>
-              <span className="text-xs text-slate-500">credit</span>
+              <span className="text-2xl font-bold text-amber-300">{user?.credits ?? 0}</span>
+              <span className="text-xs text-amber-400/50">credit</span>
             </div>
             <button
               onClick={() => setShowTopUp(true)}
-              className="w-full py-2 px-3 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 text-slate-300 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
+              className="w-full py-2 px-3 rounded-lg bg-amber-500/[0.08] hover:bg-amber-500/[0.14] border border-amber-500/[0.15] text-amber-300/80 hover:text-amber-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
             >
               <span>+ Top Up</span>
             </button>
@@ -115,7 +113,7 @@ export function AppLayout() {
       <main className="flex-1 h-screen overflow-y-auto scrollbar-hide relative">
         {/* Subtle mesh/glow background behind everything */}
         <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
-        <div className="absolute top-[-100px] left-[50%] -translate-x-1/2 w-[600px] h-[300px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-[-100px] left-[50%] -translate-x-1/2 w-[600px] h-[300px] bg-amber-500/[0.03] blur-[120px] rounded-full pointer-events-none"></div>
         
         <div className="relative z-10 p-8 h-full">
           <Outlet />

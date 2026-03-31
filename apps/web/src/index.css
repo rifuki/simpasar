@@ -11,7 +11,7 @@
 
 @layer base {
   body {
-    @apply bg-[#0a0a0f] text-slate-300;
+    @apply bg-[#0c0c0a] text-slate-300;
   }
   
   button, 
@@ -33,7 +33,7 @@
 
 body {
   margin: 0;
-  background: #0a0a0f;
+  background: #0c0c0a;
   color: #e2e8f0;
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;

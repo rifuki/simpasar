@@ -148,6 +148,7 @@ export type IndustryType = "fnb" | "beauty" | "fashion" | "retail" | "services";
 export interface Cluster {
   id: string;
   name: string;
+  cityId: string; // FK to cities table
   city: string;
   province: string;
   industry: IndustryType;
@@ -161,6 +162,7 @@ export interface Cluster {
   icon: string;
   color: string;
   activePersonas: number;
+  category: string; // product category for simulation e.g. "fnb_beverage"
 }
 
 export interface ClusterSimulationRequest {

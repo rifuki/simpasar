@@ -68,15 +68,15 @@ export function AppDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="lg:col-span-1 bg-[#0a0a0f] border border-white/[0.08] shadow-2xl rounded-2xl p-6 relative overflow-hidden"
+          className="lg:col-span-1 bg-[#111008] border border-amber-500/[0.1] shadow-2xl rounded-2xl p-6 relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 p-6 opacity-5">
             <Wallet className="w-32 h-32 text-white" />
           </div>
 
           <div className="relative z-10">
-            <div className="text-slate-400 text-sm font-medium mb-4 flex items-center gap-2 border border-white/10 bg-white/5 w-fit px-3 py-1.5 rounded-lg">
-              <div className="w-2 h-2 rounded-full bg-slate-300" />
+            <div className="text-amber-400/70 text-sm font-medium mb-4 flex items-center gap-2 border border-amber-500/20 bg-amber-500/[0.06] w-fit px-3 py-1.5 rounded-lg">
+              <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               Saldo Aktif
             </div>
 
@@ -84,10 +84,10 @@ export function AppDashboard() {
               <div className="h-16 w-32 bg-white/5 animate-pulse rounded-lg mt-4" />
             ) : (
               <div className="flex items-end gap-3 mt-4">
-                <div className="text-6xl font-bold text-white tracking-tight leading-none">
+                <div className="text-6xl font-bold text-amber-300 tracking-tight leading-none">
                   {user?.credits || 0}
                 </div>
-                <div className="text-slate-500 text-sm mb-1 font-medium">
+                <div className="text-amber-400/50 text-sm mb-1 font-medium">
                   credit tersisa
                 </div>
               </div>
@@ -95,7 +95,7 @@ export function AppDashboard() {
 
             <button
               onClick={() => setShowTopUp(true)}
-              className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-black hover:bg-slate-200 font-semibold text-sm transition-all"
+              className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-400/10 hover:bg-amber-400/15 border border-amber-400/20 text-amber-300 hover:text-amber-200 font-semibold text-sm transition-all"
             >
               <Plus className="w-4 h-4" /> Top Up Saldo
             </button>
@@ -113,17 +113,17 @@ export function AppDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="lg:col-span-2 bg-[#0a0a0f] border border-white/[0.08] shadow-2xl rounded-2xl p-6 flex flex-col justify-center"
+          className="lg:col-span-2 bg-[#0f0f0d] border border-white/[0.06] shadow-2xl rounded-2xl p-6 flex flex-col justify-center"
         >
           <h3 className="text-white text-lg font-semibold mb-6">Mulai Simulasi</h3>
 
           <Link
             to="/app/simulate"
-            className="group flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-white/[0.04] transition-all mb-4"
+            className="group flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-emerald-500/[0.04] hover:border-emerald-500/[0.1] transition-all mb-4"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-slate-300" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 group-hover:border-emerald-500/20 group-hover:bg-emerald-500/[0.06] flex items-center justify-center transition-all">
+                <Zap className="w-5 h-5 text-slate-400 group-hover:text-emerald-400 transition-colors" />
               </div>
               <div>
                 <div className="text-white font-medium group-hover:text-slate-200 transition-colors">
@@ -142,8 +142,8 @@ export function AppDashboard() {
             className="group flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-white/[0.04] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
-                <History className="w-5 h-5 text-slate-300" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 group-hover:border-emerald-500/20 group-hover:bg-emerald-500/[0.06] flex items-center justify-center transition-all">
+                <History className="w-5 h-5 text-slate-400 group-hover:text-emerald-400 transition-colors" />
               </div>
               <div>
                 <div className="text-white font-medium group-hover:text-slate-200 transition-colors">

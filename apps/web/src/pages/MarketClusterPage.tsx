@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Sparkles, Grid3X3, LayoutList } from "lucide-react";
@@ -15,15 +15,6 @@ import { TopUpModal } from "../components/payment/TopUpModal";
 import { useToast } from "../components/ui/Toast";
 import { api } from "../lib/api";
 import type { Cluster, ClusterSimulationRequest, SimulationResult } from "@shared/types";
-
-// Industry filter data
-const INDUSTRIES = [
-  { id: "fnb", label: "Food & Beverage", color: "orange" },
-  { id: "beauty", label: "Beauty", color: "pink" },
-  { id: "fashion", label: "Fashion", color: "violet" },
-  { id: "retail", label: "Retail", color: "emerald" },
-  { id: "services", label: "Services", color: "blue" },
-];
 
 
 export function MarketClusterPage() {
@@ -112,11 +103,14 @@ export function MarketClusterPage() {
     setSimLabel(SIMULATION_STEPS[0].label);
 
     try {
-      const cityId = mapClusterToCity(request.clusterId);
+      // Get cityId and category directly from the cluster data (from DB)
+      const cluster = clusters.find(c => c.id === request.clusterId);
+      const cityId = cluster?.cityId || request.clusterId;
+      const category = cluster?.category || "fnb_beverage";
       const body = JSON.stringify({
         product: {
           name: request.product.name,
-          category: getCategoryFromCluster(request.clusterId),
+          category,
           description: request.product.description,
           price: request.product.price,
           priceUnit: request.product.priceUnit,
@@ -195,31 +189,20 @@ export function MarketClusterPage() {
     setShowChat(false);
   };
 
-  function mapClusterToCity(clusterId: string): string {
-    const mappings: Record<string, string> = {
-      "fnb-depok": "malang",
-      "fnb-yogyakarta": "yogyakarta",
-      "fnb-solo": "semarang",
-      "fnb-bandung": "bandung",
-      "beauty-solo": "semarang",
-      "beauty-depok": "malang",
-      "beauty-surabaya": "surabaya",
-      "fashion-bandung": "bandung",
-      "fashion-yogyakarta": "yogyakarta",
-      "retail-malang": "malang",
-      "services-surabaya": "surabaya",
-      "services-semarang": "semarang",
-    };
-    return mappings[clusterId] || "malang";
-  }
-
-  function getCategoryFromCluster(clusterId: string): string {
-    if (clusterId.includes("fnb")) return "fnb_beverage";
-    if (clusterId.includes("beauty")) return "beauty";
-    if (clusterId.includes("fashion")) return "fashion";
-    if (clusterId.includes("retail")) return "other";
-    return "services";
-  }
+  // Derive unique industries from cluster data (no hardcode!)
+  const INDUSTRIES = useMemo(() => {
+    const seen = new Map<string, { id: string; label: string; color: string }>();
+    for (const c of clusters) {
+      if (!seen.has(c.industry)) {
+        seen.set(c.industry, {
+          id: c.industry,
+          label: c.industryLabel,
+          color: c.color || "orange",
+        });
+      }
+    }
+    return Array.from(seen.values());
+  }, [clusters]);
 
   return (
     <div className="max-w-7xl mx-auto py-4">
