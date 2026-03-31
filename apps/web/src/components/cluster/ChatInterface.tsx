@@ -301,7 +301,7 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
 
               {/* Bubble */}
               <div className={`flex flex-col max-w-[78%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words overflow-wrap-anywhere ${
                   msg.role === "user"
                     ? "bg-emerald-500 text-[#021A11] rounded-tr-sm font-medium"
                     : "bg-white/[0.04] border border-white/[0.07] text-zinc-200 rounded-tl-sm"
