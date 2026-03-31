@@ -300,7 +300,13 @@ export function LandingPage() {
                 title="Pay-As-You-Go"
                 price="300.000 IDR"
                 priceIdr="/ credit (1 Simulasi)"
-                features={["1 Credit = 1 Simulasi Penuh", "Tanpa Langganan", "Akses Seluruh Pasar Aktif", "Full Sentiment & WTP Analysis", "Credit Berlaku 12 Bulan"]}
+                features={[
+                  "1 Credit = 1x Analisis Komprehensif", 
+                  "Bebas Pilih Area/Klaster Tersedia", 
+                  "Mencakup Sesi Chat AI Evaluasi 12 Jam", 
+                  "Laporan Sentimen Pasar & Willingness-To-Pay", 
+                  "Kredit Berlaku Selamanya (Tanpa Kedaluwarsa)"
+                ]}
                 buttonText="Beli Credit"
               />
             </motion.div>
