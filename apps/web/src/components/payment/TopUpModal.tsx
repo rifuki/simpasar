@@ -327,14 +327,6 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
             {txSignature && !isConfirmed && (
               <motion.div key="pending" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                 className="flex flex-col items-center gap-4 py-4">
-                {/* Spinner */}
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute w-14 h-14 rounded-full border border-emerald-500/15 animate-ping" />
-                  <div className="w-12 h-12 rounded-full bg-white/4 border border-white/8 flex items-center justify-center">
-                    <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
-                  </div>
-                </div>
-
                 {/* Steps */}
                 <div className="flex items-center gap-1.5 w-full">
                   <div className="flex flex-col items-center gap-1 flex-1">
