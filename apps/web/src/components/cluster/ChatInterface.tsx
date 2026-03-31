@@ -270,7 +270,7 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 space-y-4">
           {/* Loading history indicator */}
           {isFetchingHistory && (
             <div className="flex items-center justify-center py-4 gap-2 text-zinc-600 text-xs">
@@ -281,11 +281,11 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
 
           {messages.map((msg) => (
             <motion.div
-              key={msg.id}
+              key={`${msg.id}-${msg.role}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+              className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse justify-start" : "justify-start"}`}
             >
               {/* Avatar */}
               <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
@@ -300,8 +300,8 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
               </div>
 
               {/* Bubble */}
-              <div className={`flex flex-col max-w-[78%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words overflow-wrap-anywhere ${
+              <div className={`flex flex-col max-w-[78%] min-w-0 ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words whitespace-pre-wrap min-w-0 ${
                   msg.role === "user"
                     ? "bg-emerald-500 text-[#021A11] rounded-tr-sm font-medium"
                     : "bg-white/[0.04] border border-white/[0.07] text-zinc-200 rounded-tl-sm"

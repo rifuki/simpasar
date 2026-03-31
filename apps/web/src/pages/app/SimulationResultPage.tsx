@@ -4,6 +4,17 @@ import { api } from "../../lib/api";
 import { Loader2, ArrowLeft, BarChart3, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+
+// Hook to track window width
+function useWindowWidth() {
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return width;
+}
 import { SummaryCard } from "../../components/results/SummaryCard";
 import { SegmentChart } from "../../components/results/SegmentChart";
 import { PersonaGrid } from "../../components/results/PersonaGrid";
@@ -14,6 +25,8 @@ export function SimulationResultPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const windowWidth = useWindowWidth();
+  const isLargeScreen = windowWidth >= 1024;
 
   // Lock body scroll on mobile when chat is open
   useEffect(() => {
@@ -124,7 +137,7 @@ export function SimulationResultPage() {
               className={`shrink-0 h-full flex flex-col border border-white/[0.08] bg-[#0c0c0a] rounded-2xl overflow-hidden shadow-2xl z-50
                 fixed lg:static top-20 right-4 bottom-4 w-[calc(100vw-32px)] sm:w-[400px] lg:w-[420px] xl:w-[480px] lg:ml-6
               `}
-              style={window.innerWidth >= 1024 ? { height: '100%' } : { height: 'calc(100vh - 100px)' }}
+              style={{ height: isLargeScreen ? '100%' : 'calc(100vh - 100px)' }}
             >
                 <div className="min-w-[300px] w-full h-full">
                   <ChatInterface simulationResult={result} mode="embedded" onClose={() => setIsChatOpen(false)} />
