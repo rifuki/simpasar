@@ -15,9 +15,7 @@ import { adminClusters } from "./routes/admin/clusters";
 import { adminSimulations } from "./routes/admin/simulations";
 import { adminSettings } from "./routes/admin/settings";
 import { adminStats } from "./routes/admin/stats";
-import { seedIfEmpty } from "./db/seed";
-
-seedIfEmpty();
+// Migrations run automatically when db is imported (via database.ts → migrate.ts)
 
 const app = new Hono();
 
