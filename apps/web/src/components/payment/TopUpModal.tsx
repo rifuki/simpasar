@@ -28,6 +28,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState("");
   const [creditsCount, setCreditsCount] = useState(1);
+  const [txSignature, setTxSignature] = useState<string | null>(null);
 
   const PRICE_PER_CREDIT = 75000;
 
@@ -163,6 +164,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
 
       const signature = await sendTransaction(tx, connection);
       console.log("Tx sent:", signature);
+      setTxSignature(signature);
       // Backend polling will catch confirmation naturally
     } catch (err: any) {
       console.error("Wallet transaction error:", err);
@@ -226,7 +228,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
         </div>
 
         {/* Credit Quantity Picker */}
-        {!isConfirmed && (
+        {!isConfirmed && !txSignature && (
           <div className="relative z-10 mb-5">
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2 px-1">Jumlah Credit</p>
             <div className="grid grid-cols-4 gap-2 mb-3">
@@ -268,7 +270,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
         )}
 
         {/* Tabs */}
-        {!isConfirmed && (
+        {!isConfirmed && !txSignature && (
           <div className="flex bg-[#111] p-1 rounded-xl mb-6 relative z-10 border border-white/5 shadow-inner">
             <button
               onClick={() => setActiveTab("wallet")}
@@ -313,6 +315,76 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
               </motion.div>
             )}
 
+            {/* Awaiting confirmation state */}
+            {txSignature && !isConfirmed && (
+              <motion.div
+                key="pending"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="flex flex-col items-center justify-center py-8 gap-6 min-h-[220px]"
+              >
+                {/* Animated ring */}
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute w-20 h-20 rounded-full border-2 border-emerald-500/20 animate-ping" />
+                  <div className="absolute w-20 h-20 rounded-full bg-emerald-500/5 blur-md" />
+                  <div className="w-16 h-16 rounded-full bg-[#111] border border-emerald-500/30 flex items-center justify-center relative z-10">
+                    <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                  </div>
+                </div>
+
+                {/* Step indicator */}
+                <div className="flex items-center gap-2 w-full px-2">
+                  {/* Step 1 — done */}
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    </div>
+                    <span className="text-[10px] text-emerald-400 font-semibold text-center leading-tight">Terkirim</span>
+                  </div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/40 to-white/10 mb-3" />
+                  {/* Step 2 — active */}
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-6 h-6 rounded-full bg-zinc-800 border border-white/20 flex items-center justify-center">
+                      <Loader2 className="w-3.5 h-3.5 text-zinc-400 animate-spin" />
+                    </div>
+                    <span className="text-[10px] text-white font-semibold text-center leading-tight">Konfirmasi</span>
+                  </div>
+                  <div className="flex-1 h-px bg-white/10 mb-3" />
+                  {/* Step 3 — waiting */}
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center">
+                      <span className="text-[10px] text-zinc-600 font-bold">3</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-600 font-semibold text-center leading-tight">Selesai</span>
+                  </div>
+                </div>
+
+                <div className="text-center space-y-1">
+                  <p className="text-white font-semibold text-sm">Menunggu Konfirmasi Blockchain</p>
+                  <p className="text-zinc-500 text-xs">Biasanya selesai dalam 5–15 detik</p>
+                </div>
+
+                {/* TX Hash */}
+                <a
+                  href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 transition-colors group w-full"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Transaction Hash</p>
+                    <p className="text-xs text-zinc-300 font-mono truncate group-hover:text-white transition-colors">
+                      {txSignature.slice(0, 20)}...{txSignature.slice(-8)}
+                    </p>
+                  </div>
+                  <svg className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </motion.div>
+            )}
+
             {/* Success state */}
             {isConfirmed ? (
               <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-8 gap-5 text-emerald-400 min-h-[220px]">
@@ -330,7 +402,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
             ) : null}
 
             {/* Wallet Pay Tab */}
-            {checkout && !isConfirmed && activeTab === "wallet" && (
+            {checkout && !isConfirmed && !txSignature && activeTab === "wallet" && (
               <motion.div key="wallet" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col min-h-[220px]">
                 <div className="bg-[#111] border border-white/5 rounded-2xl p-5 w-full flex-1 flex flex-col text-center justify-between gap-4">
                   
@@ -388,7 +460,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
             )}
 
             {/* QR Scan Tab */}
-            {checkout && !isConfirmed && activeTab === "qr" && (
+            {checkout && !isConfirmed && !txSignature && activeTab === "qr" && (
               <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col min-h-[220px]">
                 <div className="bg-[#12121a] border border-white/5 p-4 rounded-2xl flex justify-center items-center flex-1">
                   <div className="bg-white p-3 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)]">
@@ -406,17 +478,25 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
           </AnimatePresence>
         </div>
 
-        {/* Footer info showing polling status if we have checkout data but no confirmation yet */}
+        {/* Footer */}
         {checkout && !isConfirmed && (
           <div className="text-center relative z-10 mt-6 pt-5 border-t border-white/10 space-y-3">
-            <div className="inline-flex items-center gap-2 text-[13px] font-medium text-zinc-400 bg-[#111] border border-white/5 px-4 py-2 rounded-full shadow-inner">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[ping_1.5s_ease-in-out_infinite]"></span>
-              Sistem backend memonitor pembayaran...
-            </div>
-            
-            <p className="text-xs text-zinc-500">
-              Butuh saldo IDRX Devnet? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">Faucet Gratis</a>
-            </p>
+            {txSignature ? (
+              <div className="inline-flex items-center gap-2 text-[13px] font-medium text-emerald-400/80 bg-emerald-500/5 border border-emerald-500/20 px-4 py-2 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[ping_1.5s_ease-in-out_infinite]"></span>
+                Backend memverifikasi transaksi...
+              </div>
+            ) : (
+              <>
+                <div className="inline-flex items-center gap-2 text-[13px] font-medium text-zinc-400 bg-[#111] border border-white/5 px-4 py-2 rounded-full shadow-inner">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[ping_1.5s_ease-in-out_infinite]"></span>
+                  Sistem backend memonitor pembayaran...
+                </div>
+                <p className="text-xs text-zinc-500">
+                  Butuh saldo IDRX Devnet? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">Faucet Gratis</a>
+                </p>
+              </>
+            )}
           </div>
         )}
 
