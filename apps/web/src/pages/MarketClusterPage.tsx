@@ -167,22 +167,23 @@ export function MarketClusterPage() {
             exit={{ opacity: 0 }}
             className="space-y-6"
           >
-            <div className="flex items-center justify-between sticky top-0 bg-[#0B1121] py-4 z-10 border-b border-slate-800">
+            <div className="flex items-center justify-between sticky top-0 z-10 py-4 mb-2"
+              style={{ background: "linear-gradient(to bottom, #0B1121 85%, transparent)" }}>
               <div>
-                <h2 className="text-white font-semibold text-xl">Hasil Simulasi</h2>
-                <p className="text-slate-400 text-sm">{selectedCluster?.name}</p>
+                <p className="text-[11px] text-slate-500 uppercase tracking-widest font-semibold mb-0.5">Hasil Simulasi</p>
+                <h2 className="text-white font-bold text-lg leading-tight">{selectedCluster?.name}</h2>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={openChat}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-400 text-sm font-medium transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/25 text-violet-300 text-sm font-medium transition-all hover:border-violet-500/50"
                 >
                   <Sparkles className="w-4 h-4" />
                   Konsultasi AI
                 </button>
                 <button
                   onClick={resetSimulation}
-                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-emerald-400 transition border border-slate-700 hover:border-emerald-500/50 rounded-lg px-3 py-2"
+                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all border border-white/[0.08] hover:border-white/20 rounded-xl px-3 py-2"
                 >
                   Simulasi Baru
                 </button>

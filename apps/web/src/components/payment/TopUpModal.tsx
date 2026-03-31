@@ -62,10 +62,11 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
 
   const isConfirmed = statusData?.status === "confirmed";
 
-  // Clear stale payment cache from previous sessions on mount
+  // Clear stale payment_status from previous sessions on mount
+  // (prevents ghost "confirmed" state if modal reopened after successful payment)
+  // NOTE: Do NOT remove payment_checkout here — it cancels the in-flight fetch
   useEffect(() => {
     queryClient.removeQueries({ queryKey: ["payment_status"] });
-    queryClient.removeQueries({ queryKey: ["payment_checkout"] });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

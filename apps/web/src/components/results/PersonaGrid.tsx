@@ -63,34 +63,41 @@ const getPersonaIcon = (persona: PersonaSimResult) => {
 };
 
 export function PersonaGrid({ personas }: PersonaGridProps) {
+  const buyCount = personas.filter(p => p.decision === "buy").length;
+  const considerCount = personas.filter(p => p.decision === "consider").length;
+  const passCount = personas.filter(p => p.decision === "pass").length;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Reaksi Persona</h3>
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-slate-400">Beli</span>
+        <div>
+          <h3 className="text-base font-bold text-white">Reaksi Persona</h3>
+          <p className="text-xs text-slate-500 mt-0.5">{personas.length} persona dari cluster ini disimulasikan</p>
+        </div>
+        <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="text-emerald-400 font-semibold">{buyCount} Beli</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
-            <span className="text-slate-400">Pertimbangkan</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="text-amber-400 font-semibold">{considerCount} Pertimbang</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="text-slate-400">Lewati</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+            <span className="text-red-400 font-semibold">{passCount} Lewati</span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {personas.map((persona, index) => (
           <motion.div
             key={persona.personaId}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="group bg-[#111] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all hover:shadow-lg hover:shadow-black/20"
+            transition={{ delay: 0.3 + index * 0.04, duration: 0.35 }}
+            className="group bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200"
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
