@@ -10,14 +10,14 @@ import { useToast } from "../../components/ui/Toast";
 const FEATURES = [
   {
     icon: MapPin,
-    title: "Multi-Kota",
-    desc: "Bandung, Malang, Surabaya, Semarang, Yogyakarta",
+    title: "Multi-Klaster",
+    desc: "Jabodetabek: Gading Serpong, BSD, Bekasi Timur, Depok",
     color: "blue",
   },
   {
     icon: Users,
     title: "AI Persona",
-    desc: "50+ profil konsumen realistis per kota",
+    desc: "50+ profil konsumen realistis per klaster",
     color: "purple",
   },
   {
@@ -96,7 +96,7 @@ export function AppDashboard() {
 
             <div className="mt-6 pt-5 border-t border-white/5">
               <div className="text-xs text-slate-400 mb-1 leading-relaxed">
-                * Satu simulasi memotong satu credit per kota.
+                * Satu simulasi memotong satu credit per klaster.
               </div>
             </div>
           </div>
