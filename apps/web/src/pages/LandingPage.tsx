@@ -108,9 +108,9 @@ export function LandingPage() {
               <BrainCircuit className="w-4 h-4" /> Hyperlocal Market Intelligence
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-              Validasi Ide Bisnis di Pasar Hiperlokal <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 inline-flex overflow-hidden" aria-label="Sebelum Kamu Buka.">
-                {"Sebelum Kamu Buka.".split("").map((char, index) => (
+              Simulate Before<br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 inline-flex overflow-hidden" aria-label="You Operate.">
+                {"You Operate.".split("").map((char, index) => (
                   <motion.span
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
@@ -123,7 +123,7 @@ export function LandingPage() {
               </span>
             </h1>
             <p className="text-xl text-slate-400 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Memahami dinamika pasar hiperlokal melalui simulasi AI agent berbasis data psikografi dan demografi nyata secara instan.
+              Memahami dinamika pasar hiperlokal melalui simulasi AI agent berbasis data nyata secara instan.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative">
               <div className="relative group w-full sm:w-auto">

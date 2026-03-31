@@ -147,6 +147,9 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
     setInput("");
     setIsLoading(true);
 
+    const abortCtrl = new AbortController();
+    const timeout = setTimeout(() => abortCtrl.abort(), 30000); // 30s timeout
+
     try {
       const history = messages
         .filter((m) => !m.isLoading && m.id !== "welcome")
@@ -156,6 +159,7 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, simulationId, simulationResult, history }),
+        signal: abortCtrl.signal,
       });
 
       const data = await res.json() as { success?: boolean; message?: string; error?: string };
@@ -173,17 +177,21 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => prev.filter((m) => m.id !== loadingId).concat(assistantMessage));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Chat error:", err);
+      const errorMsg = (err as Error).name === "AbortError"
+        ? "Request timeout. Silakan coba lagi."
+        : "Gagal terhubung ke server. Periksa koneksi Anda.";
       setMessages((prev) =>
         prev.filter((m) => m.id !== loadingId).concat({
           id: `err-${Date.now()}`,
           role: "assistant",
-          content: "Gagal terhubung ke server. Periksa koneksi Anda.",
+          content: errorMsg,
           timestamp: new Date().toISOString(),
         })
       );
     } finally {
+      clearTimeout(timeout);
       setIsLoading(false);
       inputRef.current?.focus();
     }
