@@ -16,10 +16,7 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState } from "react";
-import { SummaryCard } from "../../components/results/SummaryCard";
-import { SegmentChart } from "../../components/results/SegmentChart";
-import { PersonaGrid } from "../../components/results/PersonaGrid";
-import type { SimulationResult } from "@shared/types";
+import { useNavigate } from "react-router-dom";
 
 interface HistoryItem {
   id: string;
@@ -30,102 +27,10 @@ interface HistoryItem {
   marketPenetration: number;
 }
 
-function SimulationDetailModal({
-  simId,
-  item,
-  onClose,
-}: {
-  simId: string;
-  item: HistoryItem;
-  onClose: () => void;
-}) {
-  const { data: detail, isLoading, isError } = useQuery<SimulationResult>({
-    queryKey: ["sim_detail", simId],
-    queryFn: async () => {
-      const res = await api.get(`/api/history/detail/${simId}`);
-      return res as SimulationResult;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center p-4 overflow-y-auto"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20, scale: 0.97 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="bg-[#0a0a0f] border border-white/10 rounded-2xl w-full max-w-4xl my-6 overflow-hidden shadow-2xl"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#111]">
-          <div>
-            <h2 className="text-white font-bold text-xl tracking-tight">{item.productName}</h2>
-            <div className="flex items-center gap-3 mt-1.5 text-sm text-slate-400">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" />
-                {item.cityName}
-              </span>
-              <span className="text-white/20">·</span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                {format(new Date(item.createdAt), "dd MMMM yyyy, HH:mm", { locale: id })}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="text-3xl font-black text-emerald-400">{item.marketPenetration}%</div>
-              <div className="text-xs text-slate-500">Penetrasi Pasar</div>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl text-slate-500 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Body */}
-        <div className="p-6">
-          {isLoading && (
-            <div className="flex flex-col items-center justify-center py-20 gap-4 text-slate-400">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
-              <p className="text-sm">Memuat detail simulasi...</p>
-            </div>
-          )}
-
-          {isError && (
-            <div className="flex flex-col items-center justify-center py-20 gap-3 text-red-400">
-              <BarChart3 className="w-10 h-10 opacity-50" />
-              <p className="text-sm">Gagal memuat detail simulasi.</p>
-            </div>
-          )}
-
-          {detail && !isLoading && (
-            <div className="space-y-6">
-              <SummaryCard result={detail} />
-              <SegmentChart segments={detail.segmentBreakdown} />
-              <PersonaGrid personas={detail.personaDetails} />
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 export function HistoryPage() {
+  const navigate = useNavigate();
   const { publicKey } = useWallet();
   const walletStr = publicKey?.toBase58();
-  const [selectedSim, setSelectedSim] = useState<HistoryItem | null>(null);
 
   const { data: history, isLoading } = useQuery({
     queryKey: ["history", walletStr],
@@ -214,40 +119,41 @@ export function HistoryPage() {
         </div>
 
         {/* History Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {history.map((item, index) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              onClick={() => setSelectedSim(item)}
-              className="group bg-[#111] border border-white/10 rounded-2xl p-5 hover:border-emerald-500/30 hover:bg-[#16161e] transition-all cursor-pointer"
+              onClick={() => navigate(`/app/result/${item.id}`)}
+              className="group relative bg-[#0c0c0a] border border-white/[0.08] hover:border-emerald-500/30 rounded-2xl p-6 transition-all cursor-pointer overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-emerald-400 transition-colors truncate">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.02] to-transparent pointer-events-none" />
+              <div className="flex items-start justify-between mb-5 relative z-10">
+                <div className="flex-1 min-w-0 pr-4">
+                  <h3 className="text-white font-bold text-lg mb-1.5 group-hover:text-emerald-400 transition-colors truncate">
                     {item.productName}
                   </h3>
-                  <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
                     <MapPin className="w-3.5 h-3.5 shrink-0" />
                     {item.cityName}
                   </div>
                 </div>
-                <div className="text-right ml-4 shrink-0">
-                  <div className="text-2xl font-bold text-emerald-400">
+                <div className="text-right shrink-0">
+                  <div className="text-3xl font-black text-emerald-400">
                     {item.marketPenetration}%
                   </div>
-                  <div className="text-xs text-slate-500">Penetrasi</div>
+                  <div className="text-[10px] uppercase font-bold text-slate-500 mt-0.5 tracking-wider">Penetrasi</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                <div className="flex items-center gap-2 text-slate-500 text-xs">
+              <div className="flex items-center justify-between pt-5 border-t border-white/[0.05] relative z-10">
+                <div className="flex items-center gap-2 text-slate-500 text-xs font-medium">
                   <Calendar className="w-3.5 h-3.5" />
-                  {format(new Date(item.createdAt), "dd MMMM yyyy, HH:mm", { locale: id })}
+                  {format(new Date(item.createdAt), "dd MMM yy, HH:mm", { locale: id })}
                 </div>
-                <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium opacity-0 group-hover:opacity-100 group-hover:gap-2 transition-all">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold transition-all border border-emerald-500/20 group-hover:bg-emerald-500/20">
                   Lihat Detail
                   <ChevronRight className="w-3.5 h-3.5" />
                 </div>
@@ -256,17 +162,6 @@ export function HistoryPage() {
           ))}
         </div>
       </div>
-
-      {/* Detail Modal */}
-      <AnimatePresence>
-        {selectedSim && (
-          <SimulationDetailModal
-            simId={selectedSim.id}
-            item={selectedSim}
-            onClose={() => setSelectedSim(null)}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 }

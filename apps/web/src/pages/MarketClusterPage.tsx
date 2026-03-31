@@ -15,6 +15,7 @@ import { useToast } from "../components/ui/Toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import { useSimulationStore } from "../stores/useSimulationStore";
+import { useNavigate } from "react-router-dom";
 import type { Cluster } from "@shared/types";
 
 export function MarketClusterPage() {
@@ -45,6 +46,7 @@ export function MarketClusterPage() {
     simThought,
   } = useSimulationStore();
 
+  const navigate = useNavigate();
   const { publicKey } = useWallet();
   const walletStr = publicKey?.toBase58();
   const { data: user, refetch: refetchUser } = useUser(walletStr ?? null);
@@ -65,6 +67,15 @@ export function MarketClusterPage() {
     fetchClusters();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Redirect to result page when simulation finishes ────────
+  useEffect(() => {
+    if (phase === "result" && simulationResult) {
+      navigate(`/app/result/${simulationResult.id}`);
+      // Wait a tick before resetting store so we don't flash content
+      setTimeout(() => resetSimulation(), 0);
+    }
+  }, [phase, simulationResult, navigate, resetSimulation]);
 
   // ── Filter clusters (derived from store's clusters list) ──
   const filteredClusters = useMemo(() => {
@@ -159,43 +170,6 @@ export function MarketClusterPage() {
           </motion.div>
         )}
 
-        {/* ── Result ────────────────────────────────────────── */}
-        {phase === "result" && simulationResult && (
-          <motion.div
-            key="results"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="space-y-6"
-          >
-            <div className="flex items-center justify-between sticky top-0 z-10 py-4 mb-2"
-              style={{ background: "linear-gradient(to bottom, #0B1121 85%, transparent)" }}>
-              <div>
-                <p className="text-[11px] text-slate-500 uppercase tracking-widest font-semibold mb-0.5">Hasil Simulasi</p>
-                <h2 className="text-white font-bold text-lg leading-tight">{selectedCluster?.name}</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={openChat}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/25 text-violet-300 text-sm font-medium transition-all hover:border-violet-500/50"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Konsultasi AI
-                </button>
-                <button
-                  onClick={resetSimulation}
-                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all border border-white/[0.08] hover:border-white/20 rounded-xl px-3 py-2"
-                >
-                  Simulasi Baru
-                </button>
-              </div>
-            </div>
-            <SummaryCard result={simulationResult} />
-            <SegmentChart segments={simulationResult.segmentBreakdown} />
-            <PersonaGrid personas={simulationResult.personaDetails} />
-          </motion.div>
-        )}
-
         {/* ── Cluster list (idle / form / error) ───────────── */}
         {(phase === "idle" || phase === "form" || phase === "error") && (
           <motion.div
@@ -278,13 +252,6 @@ export function MarketClusterPage() {
             onSubmit={handleSimulationSubmit}
             onClose={closeForm}
           />
-        )}
-      </AnimatePresence>
-
-      {/* ── Chat modal ────────────────────────────────────────── */}
-      <AnimatePresence>
-        {showChat && simulationResult && (
-          <ChatInterface simulationResult={simulationResult} onClose={closeChat} />
         )}
       </AnimatePresence>
 

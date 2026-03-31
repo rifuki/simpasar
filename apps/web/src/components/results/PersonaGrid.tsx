@@ -6,6 +6,14 @@ interface PersonaGridProps {
   personas: PersonaSimResult[];
 }
 
+function maskName(name: string): string {
+  if (!name) return "";
+  return name.split(" ").map(word => {
+    if (word.length <= 2) return word;
+    return word[0] + "*".repeat(word.length - 2) + word[word.length - 1];
+  }).join(" ");
+}
+
 const getDecisionIcon = (decision: string) => {
   switch (decision) {
     case "buy":
@@ -90,14 +98,14 @@ export function PersonaGrid({ personas }: PersonaGridProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory custom-scrollbar [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-colors">
         {personas.map((persona, index) => (
           <motion.div
             key={persona.personaId}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + index * 0.04, duration: 0.35 }}
-            className="group bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200"
+            className="flex-none w-[320px] lg:w-[340px] snap-center group bg-[#0f1115] border border-white/[0.08] rounded-2xl p-5 hover:border-white/[0.15] hover:bg-[#13151a] hover:shadow-[0_0_20px_rgba(255,255,255,0.03)] transition-all duration-300"
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
@@ -106,7 +114,7 @@ export function PersonaGrid({ personas }: PersonaGridProps) {
                   {getPersonaIcon(persona)}
                 </div>
                 <div>
-                  <h4 className="text-white font-semibold text-sm">{persona.personaName}</h4>
+                  <h4 className="text-white font-semibold text-sm">{maskName(persona.personaName)}</h4>
                   <p className="text-slate-500 text-xs">{persona.ageGroup} • {persona.occupation}</p>
                 </div>
               </div>

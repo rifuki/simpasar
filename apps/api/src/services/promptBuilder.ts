@@ -13,7 +13,8 @@ RULES:
 5. Confidence scores should reflect realistic uncertainty, not wishful thinking.
 6. All monetary values in IDR (Indonesian Rupiah, integer only).
 7. All text fields (reasoning, mainReason, overallRecommendation) must be in Bahasa Indonesia.
-8. Do NOT add any text, markdown, or explanation outside the JSON.`;
+8. Do NOT add any text, markdown, or explanation outside the JSON.
+9. FATAL RULE: DO NOT hallucinate the product form or category. If the product is explicitly food (e.g. "Jagung Sehat", "Sate"), DO NOT treat it or label it as a beverage or drink. Base your analysis STRICTLY on the exact product name, description, and assigned category. Jika kategori makanan, jangan analisis sebagai minuman.`;
 
 export function buildUserPrompt(
   request: SimulationRequest,

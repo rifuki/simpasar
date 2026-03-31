@@ -13,7 +13,8 @@ interface Message {
 
 interface ChatInterfaceProps {
   simulationResult: SimulationResult;
-  onClose: () => void;
+  onClose?: () => void;
+  mode?: "modal" | "embedded";
 }
 
 function formatTimeLeft(seconds: number): string {
@@ -46,7 +47,7 @@ function buildWelcomeMessage(result: SimulationResult): Message {
   };
 }
 
-export function ChatInterface({ simulationResult, onClose }: ChatInterfaceProps) {
+export function ChatInterface({ simulationResult, onClose, mode = "modal" }: ChatInterfaceProps) {
   const simulationId = simulationResult.id;
 
   // Calculate time left from simulation createdAt
@@ -201,33 +202,21 @@ export function ChatInterface({ simulationResult, onClose }: ChatInterfaceProps)
   // Only show suggested questions when only welcome message is present (no real history)
   const hasRealMessages = messages.filter(m => m.id !== "welcome" && !m.isLoading).length > 0;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-    >
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-      />
+  const isEmbedded = mode === "embedded";
 
-      {/* Chat Panel */}
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20, scale: 0.97 }}
-        transition={{ duration: 0.22, ease: "easeOut" }}
-        className="relative w-full max-w-2xl flex flex-col bg-[#0c0c0a] border border-white/[0.09] rounded-2xl shadow-2xl overflow-hidden"
-        style={{ height: "min(84vh, 700px)" }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07] shrink-0">
+  const content = (
+    <motion.div
+      initial={isEmbedded ? {} : { opacity: 0, y: 20, scale: 0.97 }}
+      animate={isEmbedded ? {} : { opacity: 1, y: 0, scale: 1 }}
+      exit={isEmbedded ? {} : { opacity: 0, y: 20, scale: 0.97 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className={`relative flex flex-col bg-[#0c0c0a] border border-white/[0.09] shadow-2xl overflow-hidden ${
+        isEmbedded ? "w-full h-full rounded-2xl" : "w-full max-w-2xl rounded-2xl"
+      }`}
+      style={isEmbedded ? {} : { height: "min(84vh, 700px)" }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500/25 to-violet-600/8 border border-violet-500/20 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-violet-400" />
@@ -251,12 +240,14 @@ export function ChatInterface({ simulationResult, onClose }: ChatInterfaceProps)
               <Clock className="w-3.5 h-3.5" />
               {formatTimeLeft(timeLeft)}
             </div>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-zinc-600 hover:text-white hover:bg-white/8 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {onClose && !isEmbedded && (
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-lg text-zinc-600 hover:text-white hover:bg-white/8 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -347,13 +338,15 @@ export function ChatInterface({ simulationResult, onClose }: ChatInterfaceProps)
                   <span className="text-red-400 text-sm font-medium">Sesi konsultasi 24 jam telah berakhir</span>
                 </div>
                 <p className="text-zinc-600 text-xs text-center">Jalankan simulasi baru untuk melanjutkan konsultasi AI.</p>
-                <button
-                  onClick={onClose}
-                  className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white border border-white/[0.07] hover:border-white/20 rounded-lg px-3 py-1.5 transition-all"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  Kembali ke Cluster
-                </button>
+                {onClose && !isEmbedded && (
+                  <button
+                    onClick={onClose}
+                    className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white border border-white/[0.07] hover:border-white/20 rounded-lg px-3 py-1.5 transition-all"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    Kembali ke Cluster
+                  </button>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -389,6 +382,28 @@ export function ChatInterface({ simulationResult, onClose }: ChatInterfaceProps)
           </p>
         </div>
       </motion.div>
+  );
+
+  if (isEmbedded) {
+    return content;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+      />
+      {content}
     </motion.div>
   );
 }

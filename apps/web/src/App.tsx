@@ -18,6 +18,7 @@ import { PromptPage } from "./pages/admin/PromptPage";
 import { AppLogin } from "./pages/app/AppLogin";
 import { AppDashboard } from "./pages/app/AppDashboard";
 import { HistoryPage } from "./pages/app/HistoryPage";
+import { SimulationResultPage } from "./pages/app/SimulationResultPage";
 import { MarketClusterPage } from "./pages/MarketClusterPage";
 
 // Services & Guards
@@ -54,8 +55,8 @@ export default function App() {
               <Route path="dashboard" element={<AppDashboard />} />
               <Route path="simulate" element={<Navigate to="/app/cluster" replace />} />
               <Route path="cluster" element={<MarketClusterPage />} />
-              <Route path="cluster" element={<MarketClusterPage />} />
               <Route path="history" element={<HistoryPage />} />
+              <Route path="result/:id" element={<SimulationResultPage />} />
             </Route>
             
             {/* Admin Dashboard */}
