@@ -1,5 +1,6 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { api } from "../../lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,7 +10,6 @@ import {
   ArrowRight,
   Loader2,
   X,
-  TrendingUp,
   ChevronRight,
   BarChart3,
 } from "lucide-react";
@@ -147,33 +147,31 @@ export function HistoryPage() {
 
   if (!history || history.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto py-8">
-        <div className="text-center mb-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-400 text-xs font-medium mb-4"
-          >
-            <History className="w-3.5 h-3.5" />
-            Riwayat Simulasi
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl font-bold text-white mb-2"
-          >
+      <div className="max-w-4xl mx-auto py-20 flex flex-col items-center justify-center min-h-[50vh]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-20 h-20 rounded-3xl bg-[#0a0a0f] border border-white/5 shadow-2xl flex items-center justify-center mx-auto mb-6">
+            <History className="w-8 h-8 text-slate-600" />
+          </div>
+          
+          <h1 className="text-2xl font-bold text-white tracking-tight mb-3">
             Belum Ada Riwayat
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-slate-400"
+          </h1>
+          <p className="text-slate-400 text-sm max-w-sm mx-auto mb-8 leading-relaxed">
+            Data hasil analisis intelijen pasar Anda akan muncul di sini setelah simulasi dijalankan.
+          </p>
+
+          <Link
+            to="/app/simulate"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 transition-transform active:scale-95"
           >
-            Kamu belum pernah menjalankan simulasi. Mulai sekarang!
-          </motion.p>
-        </div>
+            Mulai Simulasi Pertama
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </Link>
+        </motion.div>
       </div>
     );
   }
@@ -182,31 +180,37 @@ export function HistoryPage() {
     <>
       <div className="max-w-5xl mx-auto py-6">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-2xl font-bold text-white tracking-tight mb-1"
+            >
+              Riwayat Analisis
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-slate-400 text-sm"
+            >
+              Menampilkan {history.length} simulasi yang pernah Anda jalankan.
+            </motion.p>
+          </div>
+
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-400 text-xs font-medium mb-4"
-          >
-            <History className="w-3.5 h-3.5" />
-            Riwayat Simulasi
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl font-bold text-white mb-2"
-          >
-            Riwayat Analisis
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-slate-400"
           >
-            {history.length} simulasi telah dijalankan
-          </motion.p>
+            <Link
+              to="/app/simulate"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-slate-200 transition-all"
+            >
+              Simulasi Baru
+            </Link>
+          </motion.div>
         </div>
 
         {/* History Grid */}

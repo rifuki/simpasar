@@ -7,7 +7,7 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 
 import { getAssociatedTokenAddressSync, createTransferCheckedInstruction, createAssociatedTokenAccountInstruction, getAccount } from "@solana/spl-token";
-import { Transaction, SystemProgram } from "@solana/web3.js";
+import { Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "../ui/Toast";
@@ -99,8 +99,8 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
     },
     enabled: !!publicKey && !!checkout?.splToken,
     retry: 2,
-    staleTime: 0,
-    refetchOnMount: true,
+    staleTime: 30_000,
+    refetchOnMount: false,
   });
 
   const handleWalletPay = async () => {
@@ -135,28 +135,18 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
         );
       }
 
-      // SPL transfer with decimals check
-      tx.add(
-        createTransferCheckedInstruction(
-          senderATA,
-          splTokenPubKey,
-          recipientATA,
-          publicKey,
-          rawAmount,
-          IDRX_DECIMALS
-        )
+      // SPL transfer with decimals check + reference key embedded as readonly account
+      // (@solana/pay's validateTransfer expects reference in the transfer instruction's accounts)
+      const transferIx = createTransferCheckedInstruction(
+        senderATA,
+        splTokenPubKey,
+        recipientATA,
+        publicKey,
+        rawAmount,
+        IDRX_DECIMALS
       );
-
-      // Add reference key as no-op memo so backend can find this tx
-      tx.add(
-        new Transaction().add(...[
-          SystemProgram.transfer({
-            fromPubkey: publicKey,
-            toPubkey: referencePubKey,
-            lamports: 0,
-          })
-        ]).instructions[0]
-      );
+      transferIx.keys.push({ pubkey: referencePubKey, isSigner: false, isWritable: false });
+      tx.add(transferIx);
 
       const { blockhash } = await connection.getLatestBlockhash();
       tx.recentBlockhash = blockhash;
@@ -409,17 +399,27 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
                   {/* Ledger Display */}
                   <div className="w-full flex justify-between items-center bg-[#16161e] border border-white/10 rounded-xl p-4 shadow-inner">
                     <div className="flex flex-col items-start text-left">
-                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Saldo IDRX Anda</span>
-                      <div className="flex items-center gap-2">
-                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-5 h-5 rounded-full bg-white/10" />
-                        {isBalanceLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin text-zinc-600" />
-                        ) : isBalanceError ? (
-                          <span className="text-red-400 font-medium text-xs">Gagal memuat network</span>
-                        ) : (
+                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Saldo IDRX Anda</span>
+                      {isBalanceLoading ? (
+                        <div className="flex items-center gap-2">
+                          {/* coin icon skeleton */}
+                          <div className="w-5 h-5 rounded-full bg-white/10 animate-pulse" />
+                          {/* number skeleton — shimmer bar */}
+                          <div className="relative overflow-hidden rounded-md h-4 w-24 bg-white/5">
+                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          </div>
+                        </div>
+                      ) : isBalanceError ? (
+                        <div className="flex items-center gap-1.5 text-red-400 text-xs font-medium">
+                          <XCircle className="w-3.5 h-3.5" />
+                          RPC error
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-5 h-5 rounded-full bg-white/10" />
                           <span className="text-white font-bold leading-none">{userBalance !== undefined ? userBalance.toLocaleString("id-ID") : "0"}</span>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="w-px h-8 bg-white/10 mx-2"></div>
