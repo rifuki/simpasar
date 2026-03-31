@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/api";
-import { Loader2, ArrowLeft, BarChart3, MessageSquare, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { Loader2, ArrowLeft, BarChart3, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SummaryCard } from "../../components/results/SummaryCard";
@@ -13,7 +13,7 @@ import type { SimulationResult } from "@shared/types";
 export function SimulationResultPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isChatOpen, setIsChatOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Lock body scroll on mobile when chat is open
   useEffect(() => {
@@ -64,11 +64,11 @@ export function SimulationResultPage() {
       {/* Header Navigation */}
       <div className="flex items-center justify-between mb-4 shrink-0 px-2">
         <button
-          onClick={() => navigate("/app/history")}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium hover:bg-white/5 py-1.5 px-3 rounded-lg -ml-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          Riwayat Simulasi
+          Kembali
         </button>
         <div className="flex items-center gap-3">
            <button
