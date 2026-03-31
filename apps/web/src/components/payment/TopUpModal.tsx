@@ -62,6 +62,12 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
 
   const isConfirmed = statusData?.status === "confirmed";
 
+  // Clear stale payment cache from previous sessions on mount
+  useEffect(() => {
+    queryClient.removeQueries({ queryKey: ["payment_status"] });
+    queryClient.removeQueries({ queryKey: ["payment_checkout"] });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (isConfirmed && !successFiredRef.current) {
       successFiredRef.current = true;
