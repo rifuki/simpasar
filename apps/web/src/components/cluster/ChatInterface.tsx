@@ -65,14 +65,19 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
 
   // Load persisted messages from DB
   useEffect(() => {
+    const abortCtrl = new AbortController();
     const load = async () => {
       try {
-        const res = await fetch(`/api/chat/messages?simulationId=${simulationId}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL ?? ""}/api/chat/messages?simulationId=${simulationId}`,
+          { signal: abortCtrl.signal }
+        );
         const data = await res.json() as {
           success: boolean;
           messages: { id: string; role: string; content: string; created_at: string }[];
           isExpired: boolean;
         };
+        console.log("[ChatInterface] Loaded history:", data);
         if (data.success && data.messages.length > 0) {
           const dbMessages: Message[] = data.messages.map(m => ({
             id: m.id,
@@ -81,16 +86,20 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
             timestamp: m.created_at,
           }));
           // Always prepend welcome as first visual message
-          setMessages([buildWelcomeMessage(simulationResult), ...dbMessages]);
+          const fullMessages = [buildWelcomeMessage(simulationResult), ...dbMessages];
+          console.log("[ChatInterface] Setting messages:", fullMessages.length);
+          setMessages(fullMessages);
         }
         if (data.isExpired) setIsExpired(true);
-      } catch {
-        // Failed to load history — show welcome only
+      } catch (err: unknown) {
+        if ((err as Error).name === "AbortError") return; // Cleanup in Strict Mode
+        console.error("[ChatInterface] Load history error:", err);
       } finally {
         setIsFetchingHistory(false);
       }
     };
     load();
+    return () => abortCtrl.abort();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulationId]);
 
@@ -143,7 +152,7 @@ export function ChatInterface({ simulationResult, onClose, mode = "modal" }: Cha
         .filter((m) => !m.isLoading && m.id !== "welcome")
         .map((m) => ({ role: m.role, content: m.content }));
 
-      const res = await fetch("/api/chat", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL ?? ""}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, simulationId, simulationResult, history }),
