@@ -39,11 +39,11 @@ export function AppLogin() {
           <div className="flex flex-col items-center">
             {/* Minimal Logo */}
             <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-white/[0.03] border border-white/[0.05] mb-6">
-              <img src="/logo.png" alt="PasarSim" className="w-8 h-8 object-contain" />
+              <img src="/logo.png" alt="SimPasar" className="w-8 h-8 object-contain" />
             </div>
             
             <h1 className="text-2xl font-bold text-white tracking-tight mb-2">
-              PasarSim
+              SimPasar
             </h1>
             
             <p className="text-slate-400 text-sm mb-8 leading-relaxed">

@@ -61,7 +61,7 @@ chatRoute.post("/", async (c) => {
     if (sim) {
       const expiresAt = new Date(sim.created_at).getTime() + CHAT_SESSION_HOURS * 60 * 60 * 1000;
       if (Date.now() > expiresAt) {
-        return c.json({ error: "SESSION_EXPIRED", message: "Sesi konsultasi 24 jam telah berakhir. Jalankan simulasi baru untuk melanjutkan." }, 403);
+        return c.json({ error: "SESSION_EXPIRED", message: "Sesi konsultasi 12 jam telah berakhir. Jalankan simulasi baru untuk melanjutkan." }, 403);
       }
     }
   }
@@ -69,7 +69,7 @@ chatRoute.post("/", async (c) => {
   try {
     const { callLLM } = await import("../services/claudeService");
 
-    const systemPrompt = `Kamu adalah AI Market Consultant untuk platform PasarSim — platform simulasi pasar B2B berbasis data konsumen Indonesia.
+    const systemPrompt = `Kamu adalah AI Market Consultant untuk platform SimPasar — platform simulasi pasar B2B berbasis data konsumen Indonesia.
 
 Kamu memiliki akses ke hasil simulasi berikut:
 

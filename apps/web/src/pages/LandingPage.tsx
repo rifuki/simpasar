@@ -66,10 +66,10 @@ export function LandingPage() {
           {/* Left: Logo */}
           <div className="flex items-center gap-3 z-10">
             <div className="w-9 h-9 flex items-center justify-center p-1.5 rounded-xl bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(52,211,153,0.1)]">
-              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="SimPasar Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-              PasarSim
+              SimPasar
             </span>
           </div>
           
@@ -254,7 +254,7 @@ export function LandingPage() {
                     <CheckCircle className="w-6 h-6 text-emerald-400" />
                   </div>
                   <div>
-                    <div className="text-white font-bold text-lg tracking-tight">PasarSim</div>
+                    <div className="text-white font-bold text-lg tracking-tight">SimPasar</div>
                     <div className="text-emerald-400 text-sm">Coffee Shop Premium</div>
                   </div>
                 </div>
@@ -313,11 +313,11 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto flex py-4 flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 flex items-center justify-center p-1 rounded-lg bg-white/5 border border-white/10">
-              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+              <img src="/logo.png" alt="SimPasar Logo" className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="text-lg font-bold text-white opacity-70 group-hover:opacity-100 transition-opacity">PasarSim</span>
+            <span className="text-lg font-bold text-white opacity-70 group-hover:opacity-100 transition-opacity">SimPasar</span>
           </div>
-          <p className="text-slate-500 text-sm">© 2026 PasarSim. Empowering Local Commerce.</p>
+          <p className="text-slate-500 text-sm">© 2026 SimPasar. Empowering Local Commerce.</p>
         </div>
       </footer>
     </div>

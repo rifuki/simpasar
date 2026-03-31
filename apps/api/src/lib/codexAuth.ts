@@ -1,5 +1,5 @@
 /**
- * OpenAI Codex OAuth PKCE flow — independent implementation for PasarSim.
+ * OpenAI Codex OAuth PKCE flow — independent implementation for SimPasar.
  * Stores credentials in apps/api/codex-credentials.json
  */
 

@@ -1,6 +1,6 @@
 import { loginCodex } from "../lib/codexAuth";
 
-console.log("=== PasarSim — OpenAI Codex Login ===\n");
+console.log("=== SimPasar — OpenAI Codex Login ===\n");
 
 loginCodex()
   .then(() => process.exit(0))

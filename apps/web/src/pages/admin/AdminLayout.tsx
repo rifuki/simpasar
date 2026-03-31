@@ -23,7 +23,7 @@ export function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-56 shrink-0 border-r border-slate-800 flex flex-col">
         <div className="px-5 py-5 border-b border-slate-800">
-          <div className="text-white font-bold text-sm">PasarSim</div>
+          <div className="text-white font-bold text-sm">SimPasar</div>
           <div className="text-emerald-400 text-xs mt-0.5">Admin Panel</div>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">

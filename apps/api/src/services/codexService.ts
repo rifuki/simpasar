@@ -110,7 +110,7 @@ export async function callCodex(
       "Content-Type": "application/json",
       Accept: "text/event-stream",
       "chatgpt-account-id": creds.account_id,
-      originator: "pasarsim",
+      originator: "simpasar",
       "User-Agent": "pi (darwin; arm64)",
       "OpenAI-Beta": "responses=experimental",
     },

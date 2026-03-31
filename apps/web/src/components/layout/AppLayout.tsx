@@ -23,9 +23,9 @@ export function AppLayout() {
         <div className="px-6 py-8 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 flex items-center justify-center p-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] shadow-[0_0_15px_rgba(255,255,255,0.03)]">
-              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain opacity-90" />
+              <img src="/logo.png" alt="SimPasar Logo" className="w-full h-full object-contain opacity-90" />
             </div>
-            <div className="text-white font-extrabold text-xl tracking-tight">PasarSim</div>
+            <div className="text-white font-extrabold text-xl tracking-tight">SimPasar</div>
           </div>
         </div>
         
