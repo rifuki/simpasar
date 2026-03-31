@@ -79,14 +79,7 @@ export function SimulationPage() {
       <div className="w-full">
         {/* Header */}
         <div className="text-center mb-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-400 text-xs font-medium mb-4"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Powered by AI + Data Lapangan Indonesia
-          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -141,7 +134,7 @@ export function SimulationPage() {
                   {simulatingCount.current} / {simulatingCount.total} Kota
                 </span>
               </div>
-              <LoadingAnimation />
+              <LoadingAnimation currentStep="2" label="Simulating Markets..." />
             </motion.div>
           )}
 

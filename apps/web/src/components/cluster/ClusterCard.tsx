@@ -19,52 +19,17 @@ const iconMap = {
   Briefcase: Briefcase,
 };
 
-const colorMap = {
-  orange: {
-    bg: "from-orange-500/10 to-amber-500/5",
-    border: "border-orange-500/20",
-    borderHover: "hover:border-orange-500/40",
-    text: "text-orange-400",
-    icon: "text-orange-400",
-    glow: "group-hover:shadow-[0_0_30px_rgba(251,146,60,0.15)]",
-    badge: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  },
-  pink: {
-    bg: "from-pink-500/10 to-rose-500/5",
-    border: "border-pink-500/20",
-    borderHover: "hover:border-pink-500/40",
-    text: "text-pink-400",
-    icon: "text-pink-400",
-    glow: "group-hover:shadow-[0_0_30px_rgba(244,114,182,0.15)]",
-    badge: "bg-pink-500/20 text-pink-300 border-pink-500/30",
-  },
-  violet: {
-    bg: "from-violet-500/10 to-purple-500/5",
-    border: "border-violet-500/20",
-    borderHover: "hover:border-violet-500/40",
-    text: "text-violet-400",
-    icon: "text-violet-400",
-    glow: "group-hover:shadow-[0_0_30px_rgba(167,139,250,0.15)]",
-    badge: "bg-violet-500/20 text-violet-300 border-violet-500/30",
-  },
-  emerald: {
-    bg: "from-emerald-500/10 to-teal-500/5",
-    border: "border-emerald-500/20",
-    borderHover: "hover:border-emerald-500/40",
-    text: "text-emerald-400",
-    icon: "text-emerald-400",
-    glow: "group-hover:shadow-[0_0_30px_rgba(52,211,153,0.15)]",
-    badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  },
-  blue: {
-    bg: "from-blue-500/10 to-cyan-500/5",
-    border: "border-blue-500/20",
-    borderHover: "hover:border-blue-500/40",
-    text: "text-blue-400",
-    icon: "text-blue-400",
-    glow: "group-hover:shadow-[0_0_30px_rgba(96,165,250,0.15)]",
-    badge: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  },
+// Monochrome unified minimal theme
+const themeMap = {
+  default: {
+    bg: "bg-[#0a0a0f]",
+    border: "border-white/[0.08]",
+    borderHover: "hover:border-white/[0.2]",
+    text: "text-white",
+    icon: "text-slate-300",
+    glow: "hover:shadow-lg",
+    badge: "bg-white/[0.03] text-slate-300 border-white/5",
+  }
 };
 
 const competitionMap = {
@@ -90,7 +55,7 @@ function formatCurrency(num: number): string {
 
 export function ClusterCard({ cluster, onClick, index = 0 }: ClusterCardProps) {
   const Icon = iconMap[cluster.icon as keyof typeof iconMap] || Utensils;
-  const colors = colorMap[cluster.color as keyof typeof colorMap] || colorMap.orange;
+  const colors = themeMap.default;
   const competition = competitionMap[cluster.competitionLevel];
 
   return (
@@ -100,14 +65,14 @@ export function ClusterCard({ cluster, onClick, index = 0 }: ClusterCardProps) {
       transition={{ delay: index * 0.05, duration: 0.3 }}
       whileHover={{ y: -4 }}
       onClick={onClick}
-      className={`group relative bg-gradient-to-br ${colors.bg} border ${colors.border} ${colors.borderHover} rounded-2xl p-5 cursor-pointer transition-all duration-300 ${colors.glow} overflow-hidden`}
+      className={`group relative ${colors.bg} border ${colors.border} ${colors.borderHover} rounded-2xl p-5 cursor-pointer transition-all duration-300 ${colors.glow} overflow-hidden`}
     >
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/10 transition-all" />
       
       {/* Header with Icon */}
       <div className="relative flex items-start justify-between mb-4">
-        <div className={`p-3 rounded-xl bg-black/20 ${colors.icon}`}>
+        <div className={`p-3 rounded-xl bg-white/[0.03] border border-white/5 ${colors.icon}`}>
           <Icon className="w-6 h-6" />
         </div>
         <div className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${colors.badge}`}>
@@ -138,19 +103,19 @@ export function ClusterCard({ cluster, onClick, index = 0 }: ClusterCardProps) {
 
       {/* Stats Grid */}
       <div className="relative grid grid-cols-3 gap-2 mb-4">
-        <div className="bg-black/20 rounded-lg p-2.5 text-center">
-          <TrendingUp className={`w-4 h-4 ${colors.icon} mx-auto mb-1`} />
-          <div className="text-white text-xs font-semibold">{marketSizeMap[cluster.marketSize]}</div>
+        <div className="bg-white/[0.02] border border-white/5 rounded-lg p-2.5 text-center">
+          <TrendingUp className={`w-4 h-4 text-slate-400 mx-auto mb-1`} />
+          <div className="text-slate-300 text-xs font-semibold">{marketSizeMap[cluster.marketSize]}</div>
         </div>
-        <div className="bg-black/20 rounded-lg p-2.5 text-center">
+        <div className="bg-white/[0.02] border border-white/5 rounded-lg p-2.5 text-center">
           <Target className={`w-4 h-4 ${competition.color} mx-auto mb-1`} />
           <div className={`text-xs font-semibold ${competition.color}`}>
             {competition.label.split(" ")[1]}
           </div>
         </div>
-        <div className="bg-black/20 rounded-lg p-2.5 text-center">
+        <div className="bg-white/[0.02] border border-white/5 rounded-lg p-2.5 text-center">
           <Users className="w-4 h-4 text-slate-400 mx-auto mb-1" />
-          <div className="text-white text-xs font-semibold">{formatCurrency(cluster.avgSpending)}</div>
+          <div className="text-slate-300 text-xs font-semibold">{formatCurrency(cluster.avgSpending)}</div>
         </div>
       </div>
 
@@ -181,7 +146,7 @@ export function IndustryFilter({ industries, activeFilter, onFilterChange }: Ind
         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
           activeFilter === null
             ? "bg-white text-black border-white"
-            : "bg-transparent text-slate-400 border-slate-700 hover:border-slate-500"
+            : "bg-transparent text-slate-400 border-white/[0.08] hover:border-white/[0.2]"
         }`}
       >
         Semua
@@ -192,8 +157,8 @@ export function IndustryFilter({ industries, activeFilter, onFilterChange }: Ind
           onClick={() => onFilterChange(ind.id)}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
             activeFilter === ind.id
-              ? `bg-${ind.color}-500/20 text-${ind.color}-400 border-${ind.color}-500/50`
-              : "bg-transparent text-slate-400 border-slate-700 hover:border-slate-500"
+              ? `bg-white/10 text-white border-white/30`
+              : "bg-transparent text-slate-400 border-white/[0.08] hover:border-white/[0.2]"
           }`}
         >
           {ind.label}

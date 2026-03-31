@@ -224,14 +224,7 @@ export function MarketClusterPage() {
   return (
     <div className="max-w-7xl mx-auto py-4">
       <div className="mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-emerald-400 text-xs font-medium mb-4"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          Powered by AI + Data Lapangan Indonesia
-        </motion.div>
+
         
         <motion.div
           initial={{ opacity: 0, y: -10 }}

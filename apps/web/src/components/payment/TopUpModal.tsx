@@ -64,6 +64,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   useEffect(() => {
     if (isConfirmed) {
       queryClient.invalidateQueries({ queryKey: ["user_me", walletAddress] });
+      queryClient.invalidateQueries({ queryKey: ["idrx_balance", publicKey?.toBase58()] });
       showToast(`+${statusData?.creditsAdded ?? creditsCount} Credit berhasil ditambahkan!`, "success");
       const timer = setTimeout(() => {
         onSuccess();
@@ -406,7 +407,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
                           <div className="w-5 h-5 rounded-full bg-white/10 animate-pulse" />
                           {/* number skeleton — shimmer bar */}
                           <div className="relative overflow-hidden rounded-md h-4 w-24 bg-white/5">
-                            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                            <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                           </div>
                         </div>
                       ) : isBalanceError ? (
