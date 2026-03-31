@@ -209,7 +209,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
             <h2 className="text-sm font-semibold text-white tracking-tight">Top Up Credit</h2>
             <p className="text-[11px] text-zinc-500 mt-0.5">1 Credit = 1 Simulasi Pasar</p>
           </div>
-          {onClose && !isConfirmed && (
+          {onClose && (
             <button
               onClick={onClose}
               className="p-1.5 text-zinc-600 hover:text-zinc-300 hover:bg-white/8 rounded-lg transition-colors"
