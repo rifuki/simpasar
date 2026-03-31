@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Loader2, CheckCircle2, XCircle, X, Wallet, QrCode } from "lucide-react";
 import { api } from "../../lib/api";
@@ -29,6 +29,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   const [sendError, setSendError] = useState("");
   const [creditsCount, setCreditsCount] = useState(1);
   const [txSignature, setTxSignature] = useState<string | null>(null);
+  const successFiredRef = useRef(false);
 
   const PRICE_PER_CREDIT = 75000;
 
@@ -62,16 +63,15 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   const isConfirmed = statusData?.status === "confirmed";
 
   useEffect(() => {
-    if (isConfirmed) {
+    if (isConfirmed && !successFiredRef.current) {
+      successFiredRef.current = true;
       queryClient.invalidateQueries({ queryKey: ["user_me", walletAddress] });
       queryClient.invalidateQueries({ queryKey: ["idrx_balance", publicKey?.toBase58()] });
       showToast(`+${statusData?.creditsAdded ?? creditsCount} Credit berhasil ditambahkan!`, "success");
-      const timer = setTimeout(() => {
-        onSuccess();
-      }, 2000);
+      const timer = setTimeout(() => onSuccess(), 2500);
       return () => clearTimeout(timer);
     }
-  }, [isConfirmed, onSuccess, walletAddress, queryClient, showToast, statusData?.creditsAdded, creditsCount]);
+  }, [isConfirmed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 3. Fetch IDRX Balance — derive ATA directly, 1 RPC call
   const { data: userBalance, isLoading: isBalanceLoading, isError: isBalanceError } = useQuery({
@@ -192,7 +192,10 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget && onClose) onClose(); }}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.97, y: 6 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
