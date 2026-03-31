@@ -153,7 +153,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     });
 
     try {
-      const res = await fetch("/api/simulation/run", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL ?? ""}/api/simulation/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body,
