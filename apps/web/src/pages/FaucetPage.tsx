@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { api } from "../lib/api";
 
-const IDRX_LOGO = "https://s2.coinmarketcap.com/static/img/coins/200x200/26732.png";
+const IDRX_LOGO = "/idrx.png";
 
 export function FaucetPage() {
   const { publicKey } = useWallet();

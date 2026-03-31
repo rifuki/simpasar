@@ -412,7 +412,7 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5">
-                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-4 h-4 rounded-full" />
+                        <img src="/idrx.png" alt="IDRX" className="w-4 h-4 rounded-full" />
                         <span className="text-white font-semibold text-sm">{userBalance !== undefined ? userBalance.toLocaleString("id-ID") : "0"}</span>
                       </div>
                     )}
