@@ -27,11 +27,11 @@ export async function runSimulation(body: SimulationRequest): Promise<Simulation
 
 export const api = {
   get: async (url: string) => {
-    const finalUrl = url.startsWith("http") ? url : url.replace(BASE, "");
+    const finalUrl = url.startsWith("http") ? url : url.replace(/^\/api/, "").replace(/^\//, "");
     return handleResponse<any>(apiClient.get(finalUrl));
   },
   post: async (url: string, data: any) => {
-    const finalUrl = url.startsWith("http") ? url : url.replace(BASE, "");
+    const finalUrl = url.startsWith("http") ? url : url.replace(/^\/api/, "").replace(/^\//, "");
     return handleResponse<any>(apiClient.post(finalUrl, data));
   }
 };
