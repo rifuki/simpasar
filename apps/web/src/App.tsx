@@ -18,7 +18,6 @@ import { PromptPage } from "./pages/admin/PromptPage";
 import { AppLogin } from "./pages/app/AppLogin";
 import { AppDashboard } from "./pages/app/AppDashboard";
 import { HistoryPage } from "./pages/app/HistoryPage";
-import { SimulationPage } from "./pages/SimulationPage";
 import { MarketClusterPage } from "./pages/MarketClusterPage";
 
 // Services & Guards
@@ -26,6 +25,7 @@ import { getAdminKey } from "./lib/adminApi";
 import { WalletProviderWrapper } from "./components/layout/WalletProvider";
 import { AppGuard } from "./components/layout/AppGuard";
 import { AppLayout } from "./components/layout/AppLayout";
+import { SimulationProvider } from "./contexts/SimulationContext";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   if (!getAdminKey()) return <Navigate to="/admin/login" replace />;
@@ -48,7 +48,9 @@ export default function App() {
             {/* Business / Wallet App */}
             <Route path="/app" element={
               <AppGuard>
-                <AppLayout />
+                <SimulationProvider>
+                  <AppLayout />
+                </SimulationProvider>
               </AppGuard>
             }>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
