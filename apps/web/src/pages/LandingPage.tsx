@@ -57,7 +57,7 @@ export function LandingPage() {
       />
       
       <ParticlesBackground />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/10 via-transparent to-transparent pointer-events-none" />
       
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#06060a]/80 backdrop-blur-md">
@@ -85,7 +85,7 @@ export function LandingPage() {
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9 }}
-                className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-slate-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-colors"
+                className="text-sm font-bold bg-white text-black px-5 py-2.5 rounded-full hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-colors"
               >
                 Coba Sekarang
               </motion.button>
@@ -104,12 +104,12 @@ export function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-slate-300 text-xs font-semibold uppercase tracking-wider mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-8">
               <BrainCircuit className="w-4 h-4" /> Hyperlocal Market Intelligence
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
               Validasi Ide Bisnis di Klaster Hiperlokal <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white/90 to-slate-400 inline-flex overflow-hidden" aria-label="Dalam 1 Menit.">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 inline-flex overflow-hidden" aria-label="Dalam 1 Menit.">
                 {"Dalam 1 Menit.".split("").map((char, index) => (
                   <motion.span
                     key={index}
@@ -127,10 +127,11 @@ export function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative">
               <div className="relative group w-full sm:w-auto">
-                <div className={`absolute -inset-1 rounded-full blur-md opacity-20 transition-all duration-700 ${
+                {/* Glowing Aura that expands on hover & explodes on click */}
+                <div className={`absolute -inset-1 rounded-full blur-md opacity-40 transition-all duration-700 ${
                   isNavigating 
-                    ? 'bg-white animate-ping opacity-50 scale-150' 
-                    : 'bg-white group-hover:opacity-40 group-hover:blur-xl'
+                    ? 'bg-emerald-400 animate-ping opacity-100 scale-150' 
+                    : 'bg-gradient-to-r from-emerald-500 to-cyan-500 group-hover:opacity-100 group-hover:blur-xl'
                 }`} />
                 
                 <motion.button 
@@ -142,8 +143,8 @@ export function LandingPage() {
                   transition={{ duration: 0.8, ease: "easeInOut" }}
                   className={`relative z-10 flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 font-extrabold rounded-full transition-all duration-300 ${
                     isNavigating 
-                      ? "bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.8)]" 
-                      : "bg-white text-black hover:bg-slate-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]"
+                      ? "bg-emerald-400 text-black shadow-[0_0_50px_rgba(52,211,153,1)]" 
+                      : "bg-white text-black hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(52,211,153,0.6)]"
                   }`}
                 >
                   {isNavigating ? (
@@ -200,21 +201,21 @@ export function LandingPage() {
           >
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
               <ProblemCard 
-                icon={<Users className="w-8 h-8 text-white" />}
+                icon={<Users className="w-8 h-8 text-emerald-400" />}
                 title="Hyper-Local Insights"
                 desc="Pahami perbedaan perilaku belanja spesifik pada masing-masing klaster tanpa mengandalkan asumsi umum."
               />
             </motion.div>
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
               <ProblemCard 
-                icon={<BrainCircuit className="w-8 h-8 text-slate-300" />}
+                icon={<BrainCircuit className="w-8 h-8 text-cyan-400" />}
                 title="Backfire Warnings"
                 desc="AI kami mendeteksi potensi 'blunder' pemasaran sebelum kamu menghabiskan budget iklan."
               />
             </motion.div>
             <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
               <ProblemCard 
-                icon={<Activity className="w-8 h-8 text-slate-400" />}
+                icon={<Activity className="w-8 h-8 text-blue-400" />}
                 title="Foot Traffic Analysis"
                 desc="Estimasi dampak traffic fisik dan digital terhadap konversi penjualan produk kamu."
               />
@@ -246,21 +247,21 @@ export function LandingPage() {
               </div>
             </div>
             <div className="flex-1 relative">
-              <div className="absolute inset-0 bg-white/5 blur-3xl -z-10 rounded-full" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 blur-3xl -z-10 rounded-full" />
               <div className="border border-white/10 rounded-2xl bg-[#0a0a0f] p-8 shadow-2xl">
                 <div className="flex items-center gap-3 mb-6 pb-6 border-b border-white/5">
-                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                    <CheckCircle className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-emerald-400" />
                   </div>
                   <div>
                     <div className="text-white font-bold text-lg tracking-tight">PasarSim</div>
-                    <div className="text-slate-400 text-sm">Coffee Shop Premium</div>
+                    <div className="text-emerald-400 text-sm">Coffee Shop Premium</div>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
                     <span className="text-slate-400">Market Sentiment</span>
-                    <span className="text-lg font-bold text-white">Sangat Positif</span>
+                    <span className="text-lg font-bold text-emerald-400">Sangat Positif</span>
                   </div>
                   <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
                     <span className="text-slate-400">Willingness To Pay</span>
@@ -268,7 +269,7 @@ export function LandingPage() {
                   </div>
                   <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
                     <span className="text-slate-400">Backfire Risk</span>
-                    <span className="text-lg font-bold text-slate-300">Rendah</span>
+                    <span className="text-lg font-bold text-red-400">Rendah</span>
                   </div>
                 </div>
               </div>
@@ -358,10 +359,10 @@ function Step({ num, title, desc }: { num: string, title: string, desc: string }
   return (
     <div className="flex gap-6 group">
       <div className="flex flex-col items-center">
-        <div className="w-12 h-12 rounded-full border border-white/20 bg-[#0a0a0f] text-white flex items-center justify-center font-mono font-bold group-hover:bg-white group-hover:text-black transition-colors time">
+        <div className="w-12 h-12 rounded-full border border-emerald-500/30 bg-[#0a0a0f] text-emerald-400 flex items-center justify-center font-mono font-bold group-hover:bg-emerald-500 group-hover:text-black transition-colors time">
           {num}
         </div>
-        <div className="w-px h-full bg-gradient-to-b from-white/20 to-transparent mt-4" />
+        <div className="w-px h-full bg-gradient-to-b from-emerald-500/30 to-transparent mt-4" />
       </div>
       <div className="pb-8">
         <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -375,11 +376,11 @@ function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }
   return (
     <div className={`p-8 rounded-3xl border transition-all duration-300 group ${
       isPopular 
-        ? "border-white/30 shadow-[0_0_40px_rgba(255,255,255,0.05)] bg-white/5 scale-105 z-10" 
+        ? "border-emerald-500/50 shadow-[0_0_40px_rgba(52,211,153,0.15)] bg-emerald-950/20 scale-105 z-10" 
         : "border-white/10 bg-[#0a0a0f] hover:border-white/20"
     } relative flex flex-col`}>
       {isPopular && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-white/10 border border-white/20">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-emerald-400 to-cyan-500 text-black text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-emerald-500/20">
           Recomended
         </div>
       )}
@@ -387,13 +388,13 @@ function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }
       <div className="flex items-baseline gap-2 mb-1">
         <span className="text-4xl font-extrabold text-white tracking-tight">{price}</span>
       </div>
-      {priceIdr && <p className="text-slate-400 text-xs font-semibold mb-6">{priceIdr}</p>}
+      {priceIdr && <p className="text-emerald-400/80 text-xs font-semibold mb-6">{priceIdr}</p>}
       {!priceIdr && <div className="h-5 mb-6" />}
       
       <div className="space-y-4 mb-10 flex-1">
         {features.map((f: string, i: number) => (
           <div key={i} className="flex items-start gap-3">
-            <CheckCircle className="w-4 h-4 text-white/40 mt-0.5 shrink-0" />
+            <CheckCircle className="w-4 h-4 text-emerald-500/50 mt-0.5 shrink-0" />
             <span className="text-slate-300 text-sm leading-tight">{f}</span>
           </div>
         ))}
@@ -402,10 +403,10 @@ function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }
       <motion.button 
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.92 }}
-        className={`w-full py-3.5 rounded-xl font-bold transition-colors border ${
+        className={`w-full py-3.5 rounded-xl font-bold transition-colors ${
           isPopular 
-            ? "bg-white text-black border-transparent hover:bg-slate-200" 
-            : "bg-white/5 text-white border-white/10 hover:bg-white/10"
+            ? "bg-gradient-to-r from-emerald-400 to-cyan-500 text-black hover:shadow-[0_0_25px_rgba(52,211,153,0.4)]" 
+            : "bg-white/5 text-white hover:bg-white/10"
         }`}
       >
         {buttonText}
