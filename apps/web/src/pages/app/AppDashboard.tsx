@@ -166,7 +166,7 @@ export function AppDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-xl p-5"
+          className="bg-[#0f0f0d] border border-white/[0.06] shadow-lg rounded-xl p-5"
         >
           <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4">
             <Clock className="w-3.5 h-3.5" />
@@ -208,7 +208,7 @@ export function AppDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-xl p-5"
+          className="bg-[#0f0f0d] border border-white/[0.06] shadow-lg rounded-xl p-5"
         >
           <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4">
             <MapPin className="w-3.5 h-3.5" />
@@ -220,7 +220,7 @@ export function AppDashboard() {
                 <Link
                   key={city.id}
                   to="/app/simulate"
-                  className="px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-slate-300 text-xs font-medium hover:bg-white/[0.08] hover:text-white hover:border-white/10 transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-slate-400 text-xs font-medium hover:bg-emerald-500/[0.08] hover:text-emerald-300 hover:border-emerald-500/20 transition-all"
                 >
                   {city.name}
                 </Link>
@@ -239,7 +239,7 @@ export function AppDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-[#0a0a0f] border border-white/[0.08] shadow-lg rounded-xl p-5"
+          className="bg-[#0f0f0d] border border-white/[0.06] shadow-lg rounded-xl p-5"
         >
           <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -247,18 +247,18 @@ export function AppDashboard() {
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-sm">Total Simulasi</span>
-              <span className="text-white font-bold text-lg">{totalSimulasi}</span>
+              <span className="text-slate-500 text-sm">Total Simulasi</span>
+              <span className="text-emerald-400 font-bold text-lg">{totalSimulasi}</span>
             </div>
-            <div className="h-px bg-white/5" />
+            <div className="h-px bg-white/[0.04]" />
             <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-sm">Credit Terpakai</span>
-              <span className="text-white font-bold text-lg">{totalSimulasi}</span>
+              <span className="text-slate-500 text-sm">Credit Terpakai</span>
+              <span className="text-amber-300 font-bold text-lg">{totalSimulasi}</span>
             </div>
-            <div className="h-px bg-white/5" />
+            <div className="h-px bg-white/[0.04]" />
             <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-sm">Klaster Aktif</span>
-              <span className="text-white font-bold text-lg">{cities?.length || 0}</span>
+              <span className="text-slate-500 text-sm">Klaster Aktif</span>
+              <span className="text-emerald-400 font-bold text-lg">{cities?.length || 0}</span>
             </div>
           </div>
         </motion.div>
