@@ -25,7 +25,6 @@ import { getAdminKey } from "./lib/adminApi";
 import { WalletProviderWrapper } from "./components/layout/WalletProvider";
 import { AppGuard } from "./components/layout/AppGuard";
 import { AppLayout } from "./components/layout/AppLayout";
-import { SimulationProvider } from "./contexts/SimulationContext";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   if (!getAdminKey()) return <Navigate to="/admin/login" replace />;
@@ -48,9 +47,7 @@ export default function App() {
             {/* Business / Wallet App */}
             <Route path="/app" element={
               <AppGuard>
-                <SimulationProvider>
-                  <AppLayout />
-                </SimulationProvider>
+                <AppLayout />
               </AppGuard>
             }>
               <Route index element={<Navigate to="/app/dashboard" replace />} />

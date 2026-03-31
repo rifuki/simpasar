@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Sparkles, MapPin, Users, TrendingUp } from "lucide-react";
 import type { Cluster, ClusterSimulationRequest } from "@shared/types";
 import { formatRupiahFull } from "../../lib/utils";
+import { useSimulationStore } from "../../stores/useSimulationStore";
 
 const schema = z.object({
   productName: z.string().min(1, "Nama produk wajib diisi").max(100),
@@ -30,12 +31,15 @@ interface ClusterFormProps {
   cluster: Cluster;
   onSubmit: (data: ClusterSimulationRequest) => void;
   onClose: () => void;
-  isLoading: boolean;
 }
 
-export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFormProps) {
-  const [step, setStep] = useState<"info" | "form">("info");
-  
+export function ClusterForm({ cluster, onSubmit, onClose }: ClusterFormProps) {
+  const { formDraft, updateDraft, errorMessage } = useSimulationStore();
+
+  // formStep diambil dari store — persist saat navigasi
+  const formStep = formDraft.formStep;
+  const setFormStep = (step: "info" | "form") => updateDraft({ formStep: step });
+
   const {
     register,
     handleSubmit,
@@ -44,11 +48,29 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      priceUnit: cluster.industry === "services" ? "per_session" : cluster.industry === "fnb" ? "per_cup" : "per_piece",
+      productName: formDraft.productName || "",
+      description: formDraft.description || "",
+      price: formDraft.price as number | undefined,
+      priceUnit: (formDraft.priceUnit as any) || "per_cup",
+      additionalContext: formDraft.additionalContext || "",
     },
   });
 
   const price = watch("price");
+
+  // Sync form values ke store saat user mengetik
+  useEffect(() => {
+    const sub = watch((values) => {
+      updateDraft({
+        productName: values.productName ?? "",
+        description: values.description ?? "",
+        price: values.price,
+        priceUnit: values.priceUnit ?? "per_cup",
+        additionalContext: values.additionalContext ?? "",
+      });
+    });
+    return () => sub.unsubscribe();
+  }, [watch, updateDraft]);
 
   const onValid = (values: FormValues) => {
     const request: ClusterSimulationRequest = {
@@ -64,11 +86,6 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
     onSubmit(request);
   };
 
-  const competitionColors = {
-    high: "text-red-400 bg-red-500/10 border-red-500/20",
-    medium: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-    low: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  };
 
   const marketSizeLabels = {
     large: "Market Besar",
@@ -86,7 +103,7 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
-      
+
       {/* Modal */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -108,10 +125,17 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
           </button>
         </div>
 
+        {/* Error banner */}
+        {errorMessage && formStep === "form" && (
+          <div className="mx-6 mt-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            ⚠ {errorMessage} — data formulir Anda masih tersimpan, coba submit lagi.
+          </div>
+        )}
+
         {/* Content */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           <AnimatePresence mode="wait">
-            {step === "info" ? (
+            {formStep === "info" ? (
               <motion.div
                 key="info"
                 initial={{ opacity: 0, x: -20 }}
@@ -165,13 +189,19 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
                   </div>
                 </div>
 
-                {/* CTA */}
+                {/* CTA — kalau sudah pernah isi form, tampilkan hint */}
+                {formDraft.productName && (
+                  <div className="text-xs text-emerald-400/70 text-center">
+                    ✓ Form Anda sebelumnya masih tersimpan — klik "Lanjut ke Formulir" untuk lanjut
+                  </div>
+                )}
+
                 <button
-                  onClick={() => setStep("form")}
+                  onClick={() => setFormStep("form")}
                   className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-900 font-semibold flex items-center justify-center gap-2 transition-all"
                 >
                   <Sparkles className="w-5 h-5" />
-                  Mulai Simulasi
+                  {formDraft.productName ? "Lanjut ke Formulir" : "Mulai Simulasi"}
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </motion.div>
@@ -187,7 +217,7 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
                 {/* Back button */}
                 <button
                   type="button"
-                  onClick={() => setStep("info")}
+                  onClick={() => setFormStep("info")}
                   className="text-sm text-slate-400 hover:text-white transition-colors"
                 >
                   ← Kembali ke info cluster
@@ -274,21 +304,11 @@ export function ClusterForm({ cluster, onSubmit, onClose, isLoading }: ClusterFo
                 <div className="pt-2">
                   <button
                     type="submit"
-                    disabled={isLoading}
-                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-900 font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-900 font-semibold flex items-center justify-center gap-2 transition-all"
                   >
-                    {isLoading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
-                        Memproses...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5" />
-                        Jalankan Simulasi
-                        <ArrowRight className="w-5 h-5" />
-                      </>
-                    )}
+                    <Sparkles className="w-5 h-5" />
+                    Jalankan Simulasi
+                    <ArrowRight className="w-5 h-5" />
                   </button>
                 </div>
               </motion.form>
