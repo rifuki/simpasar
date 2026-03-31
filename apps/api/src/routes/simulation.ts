@@ -22,10 +22,15 @@ simulation.post("/run", zValidator("json", simulationRequestSchema), async (c) =
 
   return streamSSE(c, async (stream) => {
     try {
-      const result = await runSimulation(body, (step, label) => {
-        // Fire and forget — we don't await to avoid blocking the main thread
-        stream.writeSSE({ event: "progress", data: JSON.stringify({ step, label }) }).catch(() => {});
-      });
+      const result = await runSimulation(
+        body,
+        (step, label) => {
+          stream.writeSSE({ event: "progress", data: JSON.stringify({ step, label }) }).catch(() => {});
+        },
+        (token) => {
+          stream.writeSSE({ event: "thought", data: JSON.stringify({ token }) }).catch(() => {});
+        }
+      );
 
       // Deduct credit
       db.run("UPDATE users SET credits = credits - 1 WHERE wallet_address = ?", [body.walletAddress ?? ""]);

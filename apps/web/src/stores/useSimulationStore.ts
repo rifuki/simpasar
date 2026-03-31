@@ -20,7 +20,7 @@ export interface FormDraft {
   price: number | undefined;
   priceUnit: string;
   additionalContext: string;
-  formStep: "info" | "form"; // step di dalam ClusterForm modal
+  formStep: "info" | "form";
 }
 
 const DEFAULT_FORM_DRAFT: FormDraft = {
@@ -37,7 +37,6 @@ const DEFAULT_FORM_DRAFT: FormDraft = {
 // ─────────────────────────────────────────────────────────────
 
 interface SimulationStore {
-  // Core state
   phase: SimPhase;
   selectedCluster: Cluster | null;
   formDraft: FormDraft;
@@ -45,6 +44,7 @@ interface SimulationStore {
   // Simulation progress
   simStep: string;
   simLabel: string;
+  simThought: string;   // real-time AI token stream
 
   // Result
   simulationResult: SimulationResult | null;
@@ -54,24 +54,14 @@ interface SimulationStore {
   showChat: boolean;
   showTopUp: boolean;
 
-  // Cluster list cache (avoid re-fetching)
+  // Cluster list cache
   clusters: Cluster[];
 
   // ── Actions ──────────────────────────────────────────────
-
-  // Cluster list
   setClusters: (clusters: Cluster[]) => void;
-
-  // Select cluster → open form (back to "info" tab)
   selectCluster: (cluster: Cluster) => void;
-
-  // Close form → back to cluster list (preserve draft untuk kalau buka lagi)
   closeForm: () => void;
-
-  // Update form draft fields as user types
   updateDraft: (patch: Partial<FormDraft>) => void;
-
-  // Run simulation (SSE) — needs wallet & toast injected
   startSimulation: (
     request: ClusterSimulationRequest,
     ctx: {
@@ -81,11 +71,7 @@ interface SimulationStore {
       onInvalidateQueries: (keys: string[][]) => void;
     }
   ) => Promise<void>;
-
-  // Reset back to cluster list (clear result)
   resetSimulation: () => void;
-
-  // Chat & TopUp
   openChat: () => void;
   closeChat: () => void;
   openTopUp: () => void;
@@ -97,31 +83,27 @@ interface SimulationStore {
 // ─────────────────────────────────────────────────────────────
 
 export const useSimulationStore = create<SimulationStore>((set, get) => ({
-  // Initial state
   phase: "idle",
   selectedCluster: null,
   formDraft: { ...DEFAULT_FORM_DRAFT },
   simStep: SIMULATION_STEPS[0].key,
   simLabel: SIMULATION_STEPS[0].label,
+  simThought: "",
   simulationResult: null,
   errorMessage: null,
   showChat: false,
   showTopUp: false,
   clusters: [],
 
-  // ── Cluster list ─────────────────────────────────────────
   setClusters: (clusters) => set({ clusters }),
 
-  // ── Select cluster ────────────────────────────────────────
-  // Mempertahankan formDraft yang sudah ada jika cluster sama
   selectCluster: (cluster) => {
     const prev = get();
-    const sameCLuster = prev.selectedCluster?.id === cluster.id;
+    const sameCluster = prev.selectedCluster?.id === cluster.id;
     set({
       phase: "form",
       selectedCluster: cluster,
-      // Kalau pilih cluster yang sama, pertahankan draft. Kalau beda, reset
-      formDraft: sameCLuster ? prev.formDraft : {
+      formDraft: sameCluster ? prev.formDraft : {
         ...DEFAULT_FORM_DRAFT,
         priceUnit: cluster.industry === "services"
           ? "per_session"
@@ -133,11 +115,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     });
   },
 
-  // ── Close form ────────────────────────────────────────────
-  // TIDAK reset draft — user bisa balik dan lanjut isi form
   closeForm: () => set({ phase: "idle" }),
 
-  // ── Update draft ──────────────────────────────────────────
   updateDraft: (patch) =>
     set((s) => ({ formDraft: { ...s.formDraft, ...patch } })),
 
@@ -145,16 +124,15 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   startSimulation: async (request, { walletStr, onToast, onRefetchUser, onInvalidateQueries }) => {
     const { clusters, selectedCluster } = get();
 
-    // Resolve cluster info
     const cluster = clusters.find((c) => c.id === request.clusterId) ?? selectedCluster;
     const cityId = cluster?.cityId ?? request.clusterId;
     const category = cluster?.category ?? "fnb_beverage";
 
-    // Enter loading phase (form closes, loading shown)
     set({
       phase: "loading",
       simStep: SIMULATION_STEPS[0].key,
       simLabel: SIMULATION_STEPS[0].label,
+      simThought: "",
       simulationResult: null,
       errorMessage: null,
       showChat: false,
@@ -181,18 +159,14 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
         body,
       });
 
-      // ── HTTP error (400, 402, 500, etc.) ─────────────────
       if (!res.ok || !res.body) {
         const errJson = await res.json().catch(() => ({})) as any;
-
         if (errJson?.error === "INSUFFICIENT_CREDITS") {
           onToast("Saldo credit tidak cukup. Silakan top up.", "error");
-          // Balik ke form — form masih berisi data yang sudah diisi
           set({ phase: "form", showTopUp: true, errorMessage: "Insufficient credits" });
         } else {
           const msg = errJson?.message || "Gagal menjalankan simulasi";
           onToast(msg, "error");
-          // Balik ke form dengan pesan error — draft terjaga
           set({ phase: "form", errorMessage: msg });
         }
         return;
@@ -220,7 +194,10 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
           const data = JSON.parse(dataMatch[1]);
 
           if (event === "progress") {
+            console.log(`[SIM] ${data.step}: ${data.label}`);
             set({ simStep: data.step, simLabel: data.label });
+          } else if (event === "thought") {
+            set((s) => ({ simThought: s.simThought + data.token }));
           } else if (event === "result") {
             const result: SimulationResult = data.data;
             onRefetchUser();
@@ -232,13 +209,11 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
             set({
               phase: "result",
               simulationResult: result,
-              // Bersihkan draft setelah berhasil
               formDraft: { ...DEFAULT_FORM_DRAFT },
             });
           } else if (event === "error") {
             const msg = data.message || "Gagal menjalankan simulasi";
             onToast(msg, "error");
-            // Kembali ke form, draft masih ada, user tinggal klik submit lagi
             set({ phase: "form", errorMessage: msg });
           }
         }
@@ -247,12 +222,10 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       const msg = err?.message || "Koneksi gagal. Coba lagi.";
       console.error("[useSimulationStore]", err);
       onToast(msg, "error");
-      // Network error → balik ke form, draft masih ada
       set({ phase: "form", errorMessage: msg });
     }
   },
 
-  // ── Reset ke cluster list ─────────────────────────────────
   resetSimulation: () =>
     set({
       phase: "idle",
@@ -262,11 +235,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       showChat: false,
     }),
 
-  // ── Chat ──────────────────────────────────────────────────
   openChat: () => set({ showChat: true }),
   closeChat: () => set({ showChat: false }),
-
-  // ── TopUp ─────────────────────────────────────────────────
   openTopUp: () => set({ showTopUp: true }),
   closeTopUp: () => set({ showTopUp: false }),
 }));

@@ -42,6 +42,7 @@ export function MarketClusterPage() {
     closeChat,
     openTopUp,
     closeTopUp,
+    simThought,
   } = useSimulationStore();
 
   const { publicKey } = useWallet();
@@ -143,9 +144,9 @@ export function MarketClusterPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="bg-slate-800/30 border border-slate-700/50 rounded-2xl flex flex-col pt-4 overflow-hidden"
+            className="bg-[#0c0c0a] border border-white/[0.07] rounded-2xl flex flex-col pt-4 overflow-hidden"
           >
-            <div className="px-6 pb-2 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/40">
+            <div className="px-6 pb-3 border-b border-white/[0.06] flex justify-between items-center">
               <h3 className="text-emerald-400 font-semibold tracking-wide text-sm flex items-center gap-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 ANALYZING CLUSTER
@@ -154,7 +155,7 @@ export function MarketClusterPage() {
                 Anda bisa navigasi ke halaman lain — simulasi tetap berjalan di background
               </p>
             </div>
-            <LoadingAnimation currentStep={simStep} label={simLabel} />
+            <LoadingAnimation currentStep={simStep} label={simLabel} thought={simThought} />
           </motion.div>
         )}
 

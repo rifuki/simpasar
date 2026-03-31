@@ -26,7 +26,10 @@ type InputItem =
 
 // ── SSE parser ────────────────────────────────────────────────────────────────
 
-async function parseSSEStream(stream: ReadableStream<Uint8Array>): Promise<string> {
+async function parseSSEStream(
+  stream: ReadableStream<Uint8Array>,
+  onToken?: (token: string) => void
+): Promise<string> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -58,11 +61,12 @@ async function parseSSEStream(stream: ReadableStream<Uint8Array>): Promise<strin
         const type = parsed.type as string | undefined;
 
         if (type === "response.output_text.delta") {
-          fullText += (parsed.delta as string) ?? "";
+          const delta = (parsed.delta as string) ?? "";
+          fullText += delta;
+          onToken?.(delta);
         } else if (type === "response.output_text.done" && !fullText) {
           fullText += (parsed.text as string) ?? "";
         } else if (type === "response.completed" && !fullText) {
-          // Last-resort fallback
           const output = (parsed as { response?: { output?: Array<{ content?: Array<{ text?: string }> }> } })
             .response?.output?.[0]?.content?.[0]?.text;
           if (output) fullText += output;
@@ -78,7 +82,8 @@ async function parseSSEStream(stream: ReadableStream<Uint8Array>): Promise<strin
 
 export async function callCodex(
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  onToken?: (token: string) => void
 ): Promise<string> {
   const creds = await getValidCredentials();
 
@@ -119,5 +124,5 @@ export async function callCodex(
 
   if (!res.body) throw new Error("No response body from Codex");
 
-  return parseSSEStream(res.body);
+  return parseSSEStream(res.body, onToken);
 }

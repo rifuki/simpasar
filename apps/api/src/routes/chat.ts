@@ -1,15 +1,46 @@
 import { Hono } from "hono";
-// SimulationResult type inline (shared types path resolution broken in API — pre-existing issue)
+import { db } from "../db/database";
 
 export const chatRoute = new Hono();
 
+const CHAT_SESSION_HOURS = 24;
+
 interface ChatRequestBody {
   message: string;
+  simulationId?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   simulationResult: any;
   history: Array<{ role: "user" | "assistant"; content: string }>;
 }
 
+// ── GET /api/chat/messages?simulationId=xxx ───────────────────────────────────
+// Load persisted messages for a simulation
+chatRoute.get("/messages", (c) => {
+  const simulationId = c.req.query("simulationId");
+  if (!simulationId) return c.json({ error: "Missing simulationId" }, 400);
+
+  const sim = db.query("SELECT created_at FROM simulations WHERE id = ?").get(simulationId) as { created_at: string } | null;
+  if (!sim) return c.json({ error: "Simulation not found" }, 404);
+
+  // Check if session is still valid (24h from simulation creation)
+  const createdAt = new Date(sim.created_at).getTime();
+  const expiresAt = createdAt + CHAT_SESSION_HOURS * 60 * 60 * 1000;
+  const isExpired = Date.now() > expiresAt;
+
+  const messages = db.query(
+    "SELECT id, role, content, created_at FROM chat_messages WHERE simulation_id = ? ORDER BY created_at ASC"
+  ).all(simulationId) as { id: string; role: string; content: string; created_at: string }[];
+
+  return c.json({
+    success: true,
+    messages,
+    expiresAt: new Date(expiresAt).toISOString(),
+    isExpired,
+  });
+});
+
+// ── POST /api/chat ────────────────────────────────────────────────────────────
+// Send a message and get AI response; persists to DB if simulationId provided
 chatRoute.post("/", async (c) => {
   let body: ChatRequestBody;
   try {
@@ -18,10 +49,21 @@ chatRoute.post("/", async (c) => {
     return c.json({ error: "INVALID_JSON", message: "Request body tidak valid" }, 400);
   }
 
-  const { message, simulationResult, history } = body;
+  const { message, simulationId, simulationResult, history } = body;
 
   if (!message || !simulationResult) {
     return c.json({ error: "BAD_REQUEST", message: "message dan simulationResult wajib ada" }, 400);
+  }
+
+  // Enforce session expiry if simulationId provided
+  if (simulationId) {
+    const sim = db.query("SELECT created_at FROM simulations WHERE id = ?").get(simulationId) as { created_at: string } | null;
+    if (sim) {
+      const expiresAt = new Date(sim.created_at).getTime() + CHAT_SESSION_HOURS * 60 * 60 * 1000;
+      if (Date.now() > expiresAt) {
+        return c.json({ error: "SESSION_EXPIRED", message: "Sesi konsultasi 24 jam telah berakhir. Jalankan simulasi baru untuk melanjutkan." }, 403);
+      }
+    }
   }
 
   try {
@@ -51,12 +93,12 @@ HASIL SIMULASI:
 BREAKDOWN SEGMEN:
 ${simulationResult.segmentBreakdown.map((s: { name: string; percentage: number; decision: string }) => `- ${s.name}: ${s.percentage}% (${s.decision})`).join("\n")}
 
-Jawab pertanyaan user secara profesional, singkat, tepat sasaran, dalam Bahasa Indonesia. 
+Jawab pertanyaan user secara profesional, singkat, tepat sasaran, dalam Bahasa Indonesia.
 Fokus pada insight yang actionable dan spesifik berdasarkan data simulasi di atas.
 Jangan jawab hal-hal di luar konteks simulasi ini.`;
 
     const conversationHistory = (history ?? [])
-      .slice(-10) // Limit last 10 messages for context
+      .slice(-10)
       .map(m => `${m.role === "user" ? "User" : "Consultant"}: ${m.content}`)
       .join("\n");
 
@@ -65,6 +107,15 @@ Jangan jawab hal-hal di luar konteks simulasi ini.`;
       : message;
 
     const response = await callLLM(systemPrompt, userPrompt);
+
+    // Persist messages if simulationId provided
+    if (simulationId) {
+      const now = new Date().toISOString();
+      db.prepare("INSERT INTO chat_messages (id, simulation_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)")
+        .run(crypto.randomUUID(), simulationId, "user", message, now);
+      db.prepare("INSERT INTO chat_messages (id, simulation_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)")
+        .run(crypto.randomUUID(), simulationId, "assistant", response, now);
+    }
 
     return c.json({ success: true, message: response });
   } catch (err) {

@@ -5,19 +5,39 @@ import type { SimulationRequest, SimulationResult } from "../../../../packages/s
 
 // ─── Provider: Anthropic SDK (direct API key) ────────────────────────────────
 
-async function callAnthropic(systemPrompt: string, userPrompt: string): Promise<string> {
+async function callAnthropic(
+  systemPrompt: string,
+  userPrompt: string,
+  onToken?: (token: string) => void
+): Promise<string> {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set");
 
   const client = new Anthropic({ apiKey });
+
+  if (onToken) {
+    let fullText = "";
+    const stream = client.messages.stream({
+      model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+    stream.on("text", (text) => {
+      onToken(text);
+      fullText += text;
+    });
+    await stream.finalMessage();
+    return fullText;
+  }
+
   const message = await client.messages.create({
     model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
     max_tokens: 4096,
     system: systemPrompt,
     messages: [{ role: "user", content: userPrompt }],
   });
-
   return message.content[0].type === "text" ? message.content[0].text : "";
 }
 
@@ -56,17 +76,21 @@ async function callNaisu(systemPrompt: string, userPrompt: string): Promise<stri
 
 // ─── Router ──────────────────────────────────────────────────────────────────
 
-export async function callLLM(systemPrompt: string, userPrompt: string): Promise<string> {
+export async function callLLM(
+  systemPrompt: string,
+  userPrompt: string,
+  onToken?: (token: string) => void
+): Promise<string> {
   const provider = process.env.LLM_PROVIDER || "anthropic";
 
   switch (provider) {
     case "codex":
-      return callCodex(systemPrompt, userPrompt);
+      return callCodex(systemPrompt, userPrompt, onToken);
     case "naisu":
       return callNaisu(systemPrompt, userPrompt);
     case "anthropic":
     default:
-      return callAnthropic(systemPrompt, userPrompt);
+      return callAnthropic(systemPrompt, userPrompt, onToken);
   }
 }
 
@@ -86,10 +110,12 @@ function extractJson(text: string): string {
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 export type ProgressCallback = (step: string, label: string) => void;
+export type TokenCallback = (token: string) => void;
 
 export async function runSimulation(
   request: SimulationRequest,
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
+  onToken?: TokenCallback
 ): Promise<SimulationResult> {
   onProgress?.("validating", "Memvalidasi data produk...");
 
@@ -106,7 +132,7 @@ export async function runSimulation(
   const userPrompt = buildUserPrompt(request, city, personas);
 
   onProgress?.("running_ai", "Mensimulasikan keputusan pembelian...");
-  const rawText = await callLLM(systemPrompt, userPrompt);
+  const rawText = await callLLM(systemPrompt, userPrompt, onToken);
 
   onProgress?.("parsing", "Menghitung penetrasi pasar...");
   const jsonStr = extractJson(rawText);
