@@ -20,15 +20,12 @@ export function AppLayout() {
     <div className="h-screen w-full overflow-hidden bg-[#050505] flex text-white font-sans">
       {/* Sidebar */}
       <aside className="w-64 shrink-0 border-r border-white/5 bg-[#0a0a0f] flex flex-col relative z-20">
-        <div className="px-6 py-6 border-b border-white/5">
+        <div className="px-6 py-8 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 flex items-center justify-center p-1 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain" />
+            <div className="w-9 h-9 flex items-center justify-center p-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] shadow-[0_0_15px_rgba(255,255,255,0.03)]">
+              <img src="/logo.png" alt="PasarSim Logo" className="w-full h-full object-contain opacity-90" />
             </div>
-            <div>
-              <div className="text-white font-bold text-lg tracking-tight leading-none">PasarSim</div>
-              <div className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mt-1">Dashboard</div>
-            </div>
+            <div className="text-white font-extrabold text-xl tracking-tight">PasarSim</div>
           </div>
         </div>
         

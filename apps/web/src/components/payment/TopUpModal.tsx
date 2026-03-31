@@ -192,315 +192,292 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#0a0a0f] border border-white/10 p-6 md:p-8 rounded-[2rem] max-w-sm w-full shadow-[0_0_80px_rgba(0,0,0,0.8)] relative overflow-hidden"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97, y: 6 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97, y: 6 }}
+        transition={{ duration: 0.18 }}
+        className="bg-[#111114] border border-white/8 rounded-2xl max-w-xs w-full shadow-2xl relative overflow-hidden"
       >
-        {/* Glow & BG */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-
-        {/* Close Button */}
-        {onClose && !isConfirmed && (
-          <button 
-            onClick={onClose}
-            className="absolute top-5 right-5 z-20 p-2 text-zinc-500 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
-
-        <div className="text-center mb-5 relative z-10 w-[90%] mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-1 tracking-tight">Top Up Credit</h2>
-          <p className="text-zinc-500 text-xs">1 Credit = 1 Simulasi Pasar</p>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-white/6">
+          <div>
+            <h2 className="text-sm font-semibold text-white tracking-tight">Top Up Credit</h2>
+            <p className="text-[11px] text-zinc-500 mt-0.5">1 Credit = 1 Simulasi Pasar</p>
+          </div>
+          {onClose && !isConfirmed && (
+            <button
+              onClick={onClose}
+              className="p-1.5 text-zinc-600 hover:text-zinc-300 hover:bg-white/8 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
-        {/* Credit Quantity Picker */}
-        {!isConfirmed && !txSignature && (
-          <div className="relative z-10 mb-5">
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2 px-1">Jumlah Credit</p>
-            <div className="grid grid-cols-4 gap-2 mb-3">
-              {[1, 3, 5, 10].map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setCreditsCount(n)}
-                  className={`py-2 rounded-xl text-sm font-bold border transition-all ${
-                    creditsCount === n
-                      ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
-                      : "bg-white/5 border-white/10 text-zinc-400 hover:border-white/20 hover:text-white"
-                  }`}
-                >
-                  {n}x
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-3 bg-[#111] border border-white/5 rounded-xl px-4 py-2.5">
-              <button
-                onClick={() => setCreditsCount(c => Math.max(1, c - 1))}
-                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold transition-colors flex items-center justify-center text-lg leading-none"
-              >−</button>
-              <div className="flex-1 text-center">
-                <span className="text-white font-bold text-lg">{creditsCount}</span>
-                <span className="text-zinc-500 text-xs ml-1">credit</span>
+        <div className="px-5 py-4 space-y-4">
+
+          {/* Credit Quantity Picker */}
+          {!isConfirmed && !txSignature && (
+            <div className="space-y-3">
+              <p className="text-[10px] text-zinc-600 font-semibold uppercase tracking-widest">Jumlah Credit</p>
+
+              {/* Quick select */}
+              <div className="grid grid-cols-4 gap-1.5">
+                {[1, 3, 5, 10].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setCreditsCount(n)}
+                    className={`py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                      creditsCount === n
+                        ? "bg-white/10 border-white/20 text-white"
+                        : "bg-transparent border-white/6 text-zinc-500 hover:border-white/12 hover:text-zinc-300"
+                    }`}
+                  >
+                    {n}x
+                  </button>
+                ))}
               </div>
+
+              {/* Stepper */}
+              <div className="flex items-center gap-2 bg-white/4 border border-white/6 rounded-xl px-3 py-2">
+                <button
+                  onClick={() => setCreditsCount(c => Math.max(1, c - 1))}
+                  className="w-6 h-6 rounded-md bg-white/6 hover:bg-white/10 text-zinc-300 font-bold transition-colors flex items-center justify-center text-sm leading-none"
+                >−</button>
+                <div className="flex-1 text-center">
+                  <span className="text-white font-semibold text-sm">{creditsCount}</span>
+                  <span className="text-zinc-600 text-xs ml-1">credit</span>
+                </div>
+                <button
+                  onClick={() => setCreditsCount(c => Math.min(100, c + 1))}
+                  className="w-6 h-6 rounded-md bg-white/6 hover:bg-white/10 text-zinc-300 font-bold transition-colors flex items-center justify-center text-sm leading-none"
+                >+</button>
+              </div>
+
+              {/* Price summary */}
+              <div className="flex justify-between items-center">
+                <span className="text-zinc-600 text-[11px]">@75.000 IDRX / credit</span>
+                <span className="text-white font-semibold text-xs">
+                  {(creditsCount * PRICE_PER_CREDIT).toLocaleString("id-ID")} IDRX
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Tabs */}
+          {!isConfirmed && !txSignature && (
+            <div className="flex bg-white/4 p-0.5 rounded-xl border border-white/6">
               <button
-                onClick={() => setCreditsCount(c => Math.min(100, c + 1))}
-                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-white font-bold transition-colors flex items-center justify-center text-lg leading-none"
-              >+</button>
-            </div>
-            <div className="flex justify-between items-center mt-3 px-1">
-              <span className="text-zinc-500 text-xs">@75.000 IDRX / credit</span>
-              <span className="text-emerald-400 font-bold text-sm">
-                Total: {(creditsCount * PRICE_PER_CREDIT).toLocaleString("id-ID")} IDRX
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Tabs */}
-        {!isConfirmed && !txSignature && (
-          <div className="flex bg-[#111] p-1 rounded-xl mb-6 relative z-10 border border-white/5 shadow-inner">
-            <button
-              onClick={() => setActiveTab("wallet")}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1 transition-all ${
-                activeTab === "wallet" 
-                  ? "bg-white text-black shadow-md" 
-                  : "text-zinc-500 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <Wallet className="w-4 h-4" /> Bayar Wallet
-            </button>
-            <button
-              onClick={() => setActiveTab("qr")}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1 transition-all ${
-                activeTab === "qr" 
-                  ? "bg-white text-black shadow-md" 
-                  : "text-zinc-500 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <QrCode className="w-4 h-4" /> Scan QR
-            </button>
-          </div>
-        )}
-
-        {/* Payment Content View */}
-        <div className="relative z-10">
-          <AnimatePresence mode="wait">
-            
-            {/* Loading checkout state */}
-            {isCheckoutLoading && (
-              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-10 gap-3 text-zinc-500 min-h-[220px]">
-                <Loader2 className="w-8 h-8 animate-spin" />
-                <span className="text-sm font-medium">Memverifikasi Harga...</span>
-              </motion.div>
-            )}
-
-            {/* Error state */}
-            {(isCheckoutError || (!isCheckoutLoading && !checkout)) && (
-              <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-10 gap-3 text-red-400 min-h-[220px]">
-                <XCircle className="w-10 h-10" />
-                <span className="text-sm">Gagal memuat saluran pembayaran</span>
-              </motion.div>
-            )}
-
-            {/* Awaiting confirmation state */}
-            {txSignature && !isConfirmed && (
-              <motion.div
-                key="pending"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                className="flex flex-col items-center justify-center py-8 gap-6 min-h-[220px]"
+                onClick={() => setActiveTab("wallet")}
+                className={`flex-1 py-2 rounded-[10px] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  activeTab === "wallet"
+                    ? "bg-white text-black shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
               >
-                {/* Animated ring */}
+                <Wallet className="w-3.5 h-3.5" /> Bayar Wallet
+              </button>
+              <button
+                onClick={() => setActiveTab("qr")}
+                className={`flex-1 py-2 rounded-[10px] text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  activeTab === "qr"
+                    ? "bg-white text-black shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" /> Scan QR
+              </button>
+            </div>
+          )}
+
+          {/* Content area */}
+          <AnimatePresence mode="wait">
+
+            {/* Loading checkout */}
+            {isCheckoutLoading && (
+              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center py-8 gap-2 text-zinc-600">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="text-xs">Memuat...</span>
+              </motion.div>
+            )}
+
+            {/* Error */}
+            {(isCheckoutError || (!isCheckoutLoading && !checkout)) && (
+              <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center py-8 gap-2 text-red-400/80">
+                <XCircle className="w-5 h-5" />
+                <span className="text-xs">Gagal memuat pembayaran</span>
+              </motion.div>
+            )}
+
+            {/* Awaiting on-chain confirmation */}
+            {txSignature && !isConfirmed && (
+              <motion.div key="pending" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-4 py-4">
+                {/* Spinner */}
                 <div className="relative flex items-center justify-center">
-                  <div className="absolute w-20 h-20 rounded-full border-2 border-emerald-500/20 animate-ping" />
-                  <div className="absolute w-20 h-20 rounded-full bg-emerald-500/5 blur-md" />
-                  <div className="w-16 h-16 rounded-full bg-[#111] border border-emerald-500/30 flex items-center justify-center relative z-10">
-                    <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                  <div className="absolute w-14 h-14 rounded-full border border-emerald-500/15 animate-ping" />
+                  <div className="w-12 h-12 rounded-full bg-white/4 border border-white/8 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
                   </div>
                 </div>
 
-                {/* Step indicator */}
-                <div className="flex items-center gap-2 w-full px-2">
-                  {/* Step 1 — done */}
+                {/* Steps */}
+                <div className="flex items-center gap-1.5 w-full">
                   <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                     </div>
-                    <span className="text-[10px] text-emerald-400 font-semibold text-center leading-tight">Terkirim</span>
+                    <span className="text-[10px] text-emerald-400 font-medium">Terkirim</span>
                   </div>
-                  <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/40 to-white/10 mb-3" />
-                  {/* Step 2 — active */}
+                  <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/30 to-white/8 mb-3.5" />
                   <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-6 h-6 rounded-full bg-zinc-800 border border-white/20 flex items-center justify-center">
-                      <Loader2 className="w-3.5 h-3.5 text-zinc-400 animate-spin" />
+                    <div className="w-5 h-5 rounded-full bg-white/6 border border-white/12 flex items-center justify-center">
+                      <Loader2 className="w-3 h-3 text-zinc-400 animate-spin" />
                     </div>
-                    <span className="text-[10px] text-white font-semibold text-center leading-tight">Konfirmasi</span>
+                    <span className="text-[10px] text-zinc-300 font-medium">Konfirmasi</span>
                   </div>
-                  <div className="flex-1 h-px bg-white/10 mb-3" />
-                  {/* Step 3 — waiting */}
+                  <div className="flex-1 h-px bg-white/8 mb-3.5" />
                   <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-6 h-6 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center">
-                      <span className="text-[10px] text-zinc-600 font-bold">3</span>
+                    <div className="w-5 h-5 rounded-full bg-white/3 border border-white/6 flex items-center justify-center">
+                      <span className="text-[9px] text-zinc-700 font-bold">3</span>
                     </div>
-                    <span className="text-[10px] text-zinc-600 font-semibold text-center leading-tight">Selesai</span>
+                    <span className="text-[10px] text-zinc-700 font-medium">Selesai</span>
                   </div>
                 </div>
 
-                <div className="text-center space-y-1">
-                  <p className="text-white font-semibold text-sm">Menunggu Konfirmasi Blockchain</p>
-                  <p className="text-zinc-500 text-xs">Biasanya selesai dalam 5–15 detik</p>
+                <div className="text-center">
+                  <p className="text-white font-medium text-xs">Menunggu konfirmasi blockchain</p>
+                  <p className="text-zinc-600 text-[11px] mt-0.5">Biasanya 5–15 detik</p>
                 </div>
 
-                {/* TX Hash */}
+                {/* TX link */}
                 <a
                   href={`https://explorer.solana.com/tx/${txSignature}?cluster=devnet`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 transition-colors group w-full"
+                  className="flex items-center gap-2 w-full bg-white/4 hover:bg-white/6 border border-white/6 rounded-xl px-3 py-2 transition-colors group"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Transaction Hash</p>
-                    <p className="text-xs text-zinc-300 font-mono truncate group-hover:text-white transition-colors">
-                      {txSignature.slice(0, 20)}...{txSignature.slice(-8)}
+                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider mb-0.5">Tx Hash</p>
+                    <p className="text-[11px] text-zinc-400 font-mono truncate group-hover:text-zinc-200 transition-colors">
+                      {txSignature.slice(0, 18)}...{txSignature.slice(-6)}
                     </p>
                   </div>
-                  <svg className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 text-zinc-600 group-hover:text-zinc-300 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>
               </motion.div>
             )}
 
-            {/* Success state */}
-            {isConfirmed ? (
-              <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-8 gap-5 text-emerald-400 min-h-[220px]">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full" />
-                  <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center relative z-10 border border-emerald-500/30">
-                    <CheckCircle2 className="w-12 h-12 text-emerald-400 drop-shadow-md" />
-                  </div>
+            {/* Success */}
+            {isConfirmed && (
+              <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center gap-3 py-6">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/12 border border-emerald-500/20 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-black text-white tracking-tight mb-1">Transaksi Berhasil!</div>
-                  <div className="text-sm text-emerald-400/80 font-medium">+{statusData?.creditsAdded ?? creditsCount} Credit Ditambahkan</div>
-                </div>
-              </motion.div>
-            ) : null}
-
-            {/* Wallet Pay Tab */}
-            {checkout && !isConfirmed && !txSignature && activeTab === "wallet" && (
-              <motion.div key="wallet" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col min-h-[220px]">
-                <div className="bg-[#111] border border-white/5 rounded-2xl p-5 w-full flex-1 flex flex-col text-center justify-between gap-4">
-                  
-                  {/* Ledger Display */}
-                  <div className="w-full flex justify-between items-center bg-[#16161e] border border-white/10 rounded-xl p-4 shadow-inner">
-                    <div className="flex flex-col items-start text-left">
-                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-2">Saldo IDRX Anda</span>
-                      {isBalanceLoading ? (
-                        <div className="flex items-center gap-2">
-                          {/* coin icon skeleton */}
-                          <div className="w-5 h-5 rounded-full bg-white/10 animate-pulse" />
-                          {/* number skeleton — shimmer bar */}
-                          <div className="relative overflow-hidden rounded-md h-4 w-24 bg-white/5">
-                            <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                          </div>
-                        </div>
-                      ) : isBalanceError ? (
-                        <div className="flex items-center gap-1.5 text-red-400 text-xs font-medium">
-                          <XCircle className="w-3.5 h-3.5" />
-                          RPC error
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-5 h-5 rounded-full bg-white/10" />
-                          <span className="text-white font-bold leading-none">{userBalance !== undefined ? userBalance.toLocaleString("id-ID") : "0"}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="w-px h-8 bg-white/10 mx-2"></div>
-
-                    <div className="flex flex-col items-end text-right">
-                      <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Total Tagihan</span>
-                      <div className="text-emerald-400 font-bold flex items-center gap-1.5 leading-none mt-1">
-                        {checkout.amount.toLocaleString("id-ID")} <span className="text-xs font-semibold">IDRX</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {sendError && (
-                    <div className="w-full bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-xs text-red-400 text-left">
-                      {sendError}
-                    </div>
-                  )}
-
-                  {userBalance !== undefined && userBalance !== null && userBalance < checkout.amount && !sendError && (
-                    <div className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-2.5 rounded-xl w-full text-left font-medium leading-relaxed">
-                      Saldo Anda kurang. Harap isi dari <a href="/faucet" target="_blank" className="font-bold underline hover:text-amber-300">Faucet</a>.
-                    </div>
-                  )}
-
-                  <button
-                    onClick={handleWalletPay}
-                    disabled={isSending || (userBalance !== undefined && userBalance !== null && userBalance < checkout.amount)}
-                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-b from-emerald-400 to-emerald-600 text-[#021A11] font-bold shadow-[0_5px_20px_rgba(52,211,153,0.2)] hover:shadow-[0_8px_30px_rgba(52,211,153,0.3)] disabled:opacity-40 disabled:hover:shadow-none transition-all flex items-center justify-center gap-2 mt-auto"
-                  >
-                    {isSending ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" /> Otorisasi Wallet...</>
-                    ) : (
-                      "Setujui Pembayaran"
-                    )}
-                  </button>
+                  <p className="text-white font-semibold text-sm">Berhasil!</p>
+                  <p className="text-emerald-400/80 text-xs mt-0.5">+{statusData?.creditsAdded ?? creditsCount} Credit ditambahkan</p>
                 </div>
               </motion.div>
             )}
 
-            {/* QR Scan Tab */}
-            {checkout && !isConfirmed && !txSignature && activeTab === "qr" && (
-              <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col min-h-[220px]">
-                <div className="bg-[#12121a] border border-white/5 p-4 rounded-2xl flex justify-center items-center flex-1">
-                  <div className="bg-white p-3 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-                    <QRCodeSVG 
-                      value={checkout.url} 
-                      size={180}
-                      level="Q"
-                      includeMargin={false}
-                    />
+            {/* Wallet tab */}
+            {checkout && !isConfirmed && !txSignature && activeTab === "wallet" && (
+              <motion.div key="wallet" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+
+                {/* Ledger row */}
+                <div className="flex items-center justify-between bg-white/4 border border-white/6 rounded-xl px-4 py-3">
+                  <div>
+                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider mb-1.5">Saldo IDRX</p>
+                    {isBalanceLoading ? (
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-4 h-4 rounded-full bg-white/8 animate-pulse" />
+                        <div className="relative overflow-hidden rounded h-3.5 w-20 bg-white/5">
+                          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/8 to-transparent" />
+                        </div>
+                      </div>
+                    ) : isBalanceError ? (
+                      <div className="flex items-center gap-1 text-red-400/70 text-xs">
+                        <XCircle className="w-3 h-3" /> RPC error
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/26732.png" alt="IDRX" className="w-4 h-4 rounded-full" />
+                        <span className="text-white font-semibold text-sm">{userBalance !== undefined ? userBalance.toLocaleString("id-ID") : "0"}</span>
+                      </div>
+                    )}
                   </div>
+
+                  <div className="w-px h-8 bg-white/6" />
+
+                  <div className="text-right">
+                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider mb-1.5">Tagihan</p>
+                    <p className="text-emerald-400 font-semibold text-sm">{checkout.amount.toLocaleString("id-ID")} <span className="text-xs font-normal text-emerald-400/70">IDRX</span></p>
+                  </div>
+                </div>
+
+                {/* Alerts */}
+                {sendError && (
+                  <div className="bg-red-500/8 border border-red-500/15 rounded-xl p-3 text-xs text-red-400/90">
+                    {sendError}
+                  </div>
+                )}
+                {userBalance !== undefined && userBalance !== null && userBalance < checkout.amount && !sendError && (
+                  <div className="bg-amber-500/8 border border-amber-500/15 rounded-xl p-3 text-xs text-amber-400/90">
+                    Saldo kurang. Isi dari <a href="/faucet" target="_blank" className="font-semibold underline hover:text-amber-300">Faucet</a>.
+                  </div>
+                )}
+
+                {/* CTA */}
+                <button
+                  onClick={handleWalletPay}
+                  disabled={isSending || (userBalance !== undefined && userBalance !== null && userBalance < checkout.amount)}
+                  className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-semibold disabled:opacity-30 transition-colors flex items-center justify-center gap-2"
+                >
+                  {isSending ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Otorisasi Wallet...</>
+                  ) : (
+                    "Setujui Pembayaran"
+                  )}
+                </button>
+              </motion.div>
+            )}
+
+            {/* QR tab */}
+            {checkout && !isConfirmed && !txSignature && activeTab === "qr" && (
+              <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex justify-center py-2">
+                <div className="bg-white p-3 rounded-xl">
+                  <QRCodeSVG value={checkout.url} size={150} level="Q" includeMargin={false} />
                 </div>
               </motion.div>
             )}
 
           </AnimatePresence>
-        </div>
 
-        {/* Footer */}
-        {checkout && !isConfirmed && (
-          <div className="text-center relative z-10 mt-6 pt-5 border-t border-white/10 space-y-3">
-            {txSignature ? (
-              <div className="inline-flex items-center gap-2 text-[13px] font-medium text-emerald-400/80 bg-emerald-500/5 border border-emerald-500/20 px-4 py-2 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[ping_1.5s_ease-in-out_infinite]"></span>
-                Backend memverifikasi transaksi...
+          {/* Footer */}
+          {checkout && !isConfirmed && (
+            <div className="pt-3 border-t border-white/6 flex flex-col items-center gap-1.5">
+              <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {txSignature ? "Memverifikasi transaksi..." : "Backend memonitor pembayaran..."}
               </div>
-            ) : (
-              <>
-                <div className="inline-flex items-center gap-2 text-[13px] font-medium text-zinc-400 bg-[#111] border border-white/5 px-4 py-2 rounded-full shadow-inner">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-[ping_1.5s_ease-in-out_infinite]"></span>
-                  Sistem backend memonitor pembayaran...
-                </div>
-                <p className="text-xs text-zinc-500">
-                  Butuh saldo IDRX Devnet? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">Faucet Gratis</a>
+              {!txSignature && (
+                <p className="text-[11px] text-zinc-700">
+                  Butuh IDRX? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-zinc-300 transition-colors">Faucet Gratis</a>
                 </p>
-              </>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
+        </div>
       </motion.div>
     </div>
   );
