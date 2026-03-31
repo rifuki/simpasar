@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { SimulationRequest, SimulationResult, City } from "@shared/types";
 
-const BASE = "/api";
+const BASE = (import.meta.env.VITE_API_URL ?? "") + "/api";
 
 const apiClient = axios.create({ baseURL: BASE });
 
