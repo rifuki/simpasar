@@ -160,7 +160,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       });
 
       if (!res.ok || !res.body) {
-        const errJson = await res.json().catch(() => ({})) as any;
+        const errJson = await res.json().catch(() => ({})) as { error?: string, message?: string };
         if (errJson?.error === "INSUFFICIENT_CREDITS") {
           onToast("Saldo credit tidak cukup. Silakan top up.", "error");
           set({ phase: "form", showTopUp: true, errorMessage: "Insufficient credits" });
@@ -218,8 +218,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
           }
         }
       }
-    } catch (err: any) {
-      const msg = err?.message || "Koneksi gagal. Coba lagi.";
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Koneksi gagal. Coba lagi.";
       console.error("[useSimulationStore]", err);
       onToast(msg, "error");
       set({ phase: "form", errorMessage: msg });

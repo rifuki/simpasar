@@ -2,20 +2,18 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   History,
   Calendar,
   MapPin,
   ArrowRight,
   Loader2,
-  X,
   ChevronRight,
-  BarChart3,
 } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 interface HistoryItem {

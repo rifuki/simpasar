@@ -14,6 +14,7 @@ export function PromptPage() {
 
   useEffect(() => {
     if (data?.prompt) setText(data.prompt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.prompt]);
 
   const saveMut = useMutation({

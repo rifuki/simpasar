@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sparkles, Grid3X3, LayoutList } from "lucide-react";
+import { Search, Grid3X3, LayoutList } from "lucide-react";
 import { ClusterCard, IndustryFilter } from "../components/cluster/ClusterCard";
 import { ClusterForm } from "../components/cluster/ClusterForm";
-import { ChatInterface } from "../components/cluster/ChatInterface";
-import { SummaryCard } from "../components/results/SummaryCard";
-import { SegmentChart } from "../components/results/SegmentChart";
-import { PersonaGrid } from "../components/results/PersonaGrid";
 import { LoadingAnimation } from "../components/simulation/LoadingAnimation";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUser } from "../hooks/useUser";
@@ -37,10 +33,7 @@ export function MarketClusterPage() {
     simulationResult,
     simStep,
     simLabel,
-    showChat,
     showTopUp,
-    openChat,
-    closeChat,
     openTopUp,
     closeTopUp,
     simThought,

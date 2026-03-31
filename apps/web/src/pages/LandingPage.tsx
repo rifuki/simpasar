@@ -358,8 +358,16 @@ function Step({ num, title, desc }: { num: string, title: string, desc: string }
     </div>
   );
 }
+interface PricingCardProps {
+  title: string;
+  price: string;
+  priceIdr: string;
+  features: string[];
+  isPopular?: boolean;
+  buttonText: string;
+}
 
-function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }: any) {
+function PricingCard({ title, price, priceIdr, features, isPopular, buttonText }: PricingCardProps) {
   return (
     <div className={`p-8 rounded-3xl border transition-all duration-300 group ${
       isPopular 
