@@ -465,13 +465,17 @@ export function TopUpModal({ walletAddress, onSuccess, onClose }: TopUpModalProp
           {/* Footer */}
           {checkout && !isConfirmed && (
             <div className="pt-3 border-t border-white/6 flex flex-col items-center gap-1.5">
-              <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                {txSignature ? "Memverifikasi transaksi..." : "Backend memonitor pembayaran..."}
-              </div>
-              {!txSignature && (
+              {txSignature ? (
+                <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Memverifikasi di blockchain...
+                </div>
+              ) : (
                 <p className="text-[11px] text-zinc-700">
-                  Butuh IDRX? <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-zinc-300 transition-colors">Faucet Gratis</a>
+                  Devnet demo —{" "}
+                  <a href="/faucet" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-zinc-300 transition-colors">
+                    Klaim IDRX gratis
+                  </a>
                 </p>
               )}
             </div>

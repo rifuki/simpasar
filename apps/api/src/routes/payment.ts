@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { db } from "../db/database";
 import { Keypair, PublicKey, Connection } from "@solana/web3.js";
-import { encodeURL, findReference, validateTransfer } from "@solana/pay";
+import { encodeURL, findReference } from "@solana/pay";
+import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import BigNumber from "bignumber.js";
 
 export const paymentRoute = new Hono();
@@ -87,18 +88,48 @@ paymentRoute.get("/verify", async (c) => {
 
     console.log(`[payment/verify] Found signature: ${signatureInfo.signature}`);
 
+    // Manual verification — parse the tx and confirm SPL transfer to merchant ATA
     const expectedAmount = PRICE_IDRX.multipliedBy(payment.credits_requested);
+    const expectedRawAmount = expectedAmount.multipliedBy(1e6).toNumber(); // IDRX has 6 decimals
+    const merchantATA = getAssociatedTokenAddressSync(IDRX_SPL_TOKEN, MERCHANT_WALLET, true);
 
     try {
-      await validateTransfer(
-        connection,
-        signatureInfo.signature,
-        { recipient: MERCHANT_WALLET, amount: expectedAmount, splToken: IDRX_SPL_TOKEN, reference },
-        { commitment: "confirmed" }
-      );
+      const tx = await connection.getParsedTransaction(signatureInfo.signature, {
+        commitment: "confirmed",
+        maxSupportedTransactionVersion: 0,
+      });
+
+      if (!tx) throw new Error("Transaction not found");
+
+      const instructions = tx.transaction.message.instructions;
+      let transferOk = false;
+
+      for (const ix of instructions) {
+        if ("parsed" in ix && ix.program === "spl-token") {
+          const { type, info } = ix.parsed;
+          if (type === "transferChecked" || type === "transfer") {
+            const dest: string = info.destination;
+            const amount: number = type === "transferChecked" ? info.tokenAmount?.uiAmount * 1e6 : Number(info.amount);
+            if (
+              dest === merchantATA.toBase58() &&
+              amount >= expectedRawAmount * 0.99 // 1% tolerance for rounding
+            ) {
+              transferOk = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!transferOk) {
+        console.error(`[payment/verify] Manual validation failed: no matching transfer to ${merchantATA.toBase58()} for amount ${expectedRawAmount}`);
+        return c.json({ status: "validation_failed", error: "Transfer not found or amount mismatch" }, 400);
+      }
+
+      console.log(`[payment/verify] Manual validation passed for signature: ${signatureInfo.signature}`);
     } catch (validateError: any) {
-      console.error(`[payment/verify] Validation failed:`, validateError.message);
-      return c.json({ status: "validation_failed", error: validateError.message }, 400);
+      console.error(`[payment/verify] Validation error:`, validateError?.message || validateError);
+      return c.json({ status: "validation_failed", error: validateError?.message || "Validation failed" }, 400);
     }
 
     // Start transaction
