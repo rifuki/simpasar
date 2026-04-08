@@ -1,0 +1,44 @@
+services:
+  # Simpasar API
+  simpasar-api:
+    image: ghcr.io/rifuki/simpasar-api:${VERSION:-latest}
+    platform: linux/amd64
+    container_name: simpasar-api
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simpasar-api.rule=Host(`api.simpasar.rifuki.dev`)"
+      - "traefik.http.routers.simpasar-api.entrypoints=websecure"
+      - "traefik.http.routers.simpasar-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.simpasar-api.loadbalancer.server.port=3001"
+    volumes:
+      - ./apps/api/.env:/app/.env:ro
+    networks:
+      - simpasar-internal
+      - traefik-public
+
+  # Simpasar Web (Vite → nginx)
+  # Activate with: docker compose --profile www up -d
+  # Note: Usually deployed on Vercel
+  simpasar-web:
+    profiles: ["www"]
+    image: ghcr.io/rifuki/simpasar-web:${VERSION:-latest}
+    platform: linux/amd64
+    container_name: simpasar-web
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simpasar-web.rule=Host(`simpasar.rifuki.dev`)"
+      - "traefik.http.routers.simpasar-web.entrypoints=websecure"
+      - "traefik.http.routers.simpasar-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.simpasar-web.loadbalancer.server.port=80"
+    networks:
+      - traefik-public
+
+networks:
+  simpasar-internal:
+    name: simpasar-internal
+    driver: bridge
+  traefik-public:
+    name: traefik-public
+    external: true
