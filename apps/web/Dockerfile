@@ -1,22 +1,21 @@
 # Web Dockerfile (Vite → nginx)
+# Build context: Root of repo
 FROM oven/bun:1 AS builder
 
-WORKDIR /app
+WORKDIR /app/apps/web
 
-# Copy package files from root
-COPY package.json bun.lock ./
-COPY apps/web/package.json ./apps/web/
-COPY packages/shared/package.json ./packages/shared/
+# Copy package files
+COPY apps/web/package.json apps/web/bun.lock ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Copy source
-COPY apps/web ./apps/web
-COPY packages/shared ./packages/shared
+COPY apps/web ./
+COPY packages/shared ../../packages/shared
 
 # Build
-RUN cd apps/web && bun run build
+RUN bun run build
 
 # Runtime with nginx
 FROM nginx:alpine
