@@ -111,7 +111,7 @@ docker compose up -d
 
 ### API (.env)
 - `PORT=3001`
-- `FRONTEND_URL=https://simpasar.rifuki.dev`
+- `FRONTEND_URLS=https://simpasar.vercel.app,https://simpasar.rifuki.dev`
 - `ADMIN_KEY`
 - `LLM_PROVIDER=codex`
 - `SOLANA_RPC_URL`

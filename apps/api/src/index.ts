@@ -18,12 +18,18 @@ import { adminStats } from "./routes/admin/stats";
 // Migrations run automatically when db is imported (via database.ts → migrate.ts)
 
 const app = new Hono();
+const corsOrigins = [
+  ...(process.env.FRONTEND_URLS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+].filter(Boolean);
 
 app.use("*", logger());
 app.use(
   "*",
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: corsOrigins.length > 0 ? corsOrigins : "http://localhost:5173",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "X-Admin-Key"],
   })
