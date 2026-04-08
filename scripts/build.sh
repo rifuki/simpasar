@@ -46,30 +46,32 @@ printf "║ Total Services: %-42s ║\n" "$TOTAL"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 
-# Build API
+# Build API (using root as context)
 print_header "Simpasar API" "ghcr.io/rifuki/simpasar-api:$VERSION"
 log "Building simpasar-api (linux/amd64)..."
 docker build \
   --platform linux/amd64 \
   --cache-from ghcr.io/rifuki/simpasar-api:latest \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
+  -f apps/api/Dockerfile \
   -t ghcr.io/rifuki/simpasar-api:$VERSION \
   -t ghcr.io/rifuki/simpasar-api:latest \
   -t simpasar-api:local \
-  ./apps/api 2>&1
+  . 2>&1
 ok "simpasar-api built successfully"
 
-# Build Web
+# Build Web (using root as context)
 print_header "Simpasar Web" "ghcr.io/rifuki/simpasar-web:$VERSION"
 log "Building simpasar-web (linux/amd64)..."
 docker build \
   --platform linux/amd64 \
   --cache-from ghcr.io/rifuki/simpasar-web:latest \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
+  -f apps/web/Dockerfile \
   -t ghcr.io/rifuki/simpasar-web:$VERSION \
   -t ghcr.io/rifuki/simpasar-web:latest \
   -t simpasar-web:local \
-  ./apps/web 2>&1
+  . 2>&1
 ok "simpasar-web built successfully"
 
 echo ""

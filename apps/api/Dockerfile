@@ -3,15 +3,17 @@ FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files from root
 COPY package.json bun.lock ./
-COPY packages/shared ../packages/shared
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Copy source
-COPY . .
+COPY apps/api ./apps/api
+COPY packages/shared ./packages/shared
 
 # Build (if needed)
 # RUN bun run build
@@ -28,10 +30,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy built app
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api ./apps/api
+COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./
-COPY --from=builder /app/../packages/shared ../packages/shared
+
+# Set working directory to API
+WORKDIR /app/apps/api
 
 # Default port
 EXPOSE 3001

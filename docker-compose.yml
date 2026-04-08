@@ -12,7 +12,7 @@ services:
       - "traefik.http.routers.simpasar-api.tls.certresolver=letsencrypt"
       - "traefik.http.services.simpasar-api.loadbalancer.server.port=3001"
     volumes:
-      - ./apps/api/.env:/app/.env:ro
+      - ./apps/api/.env:/app/apps/api/.env:ro
     networks:
       - simpasar-internal
       - traefik-public
